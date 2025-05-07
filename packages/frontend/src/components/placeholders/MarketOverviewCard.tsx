@@ -7,12 +7,17 @@ interface MacroData {
   UNRATE?: { value: number; date: string };
 }
 interface IndexData {
-  SP500?: { value: number; change: number; percentChange: number };
-  NASDAQ?: { value: number; change: number; percentChange: number };
-  DOWJONES?: { value: number; change: number; percentChange: number };
+  SP500?: { value: number; change?: number; percentChange?: number };
+  NASDAQCOM?: { value: number; change?: number; percentChange?: number };
+  DJIA?: { value: number; change?: number; percentChange?: number };
 }
 
-const MarketOverviewCard: React.FC = () => {
+interface MarketOverviewCardProps {
+  onSelectIndex?: (index: string) => void;
+  selectedIndex?: string;
+}
+
+const MarketOverviewCard: React.FC<MarketOverviewCardProps> = ({ onSelectIndex, selectedIndex }) => {
   const [macro, setMacro] = useState<MacroData | null>(null);
   const [indices, setIndices] = useState<IndexData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -62,7 +67,13 @@ const MarketOverviewCard: React.FC = () => {
       )}
       <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
         <div className="flex flex-col">
-          <span className="text-muted-foreground">S&amp;P 500</span>
+          <button
+            className={`text-muted-foreground text-left focus:outline-none ${selectedIndex === 'SP500' ? 'underline font-semibold' : ''}`}
+            onClick={() => onSelectIndex && onSelectIndex('SP500')}
+            type="button"
+          >
+            S&amp;P 500
+          </button>
           <span className="font-medium">
             {indices?.SP500?.value != null ? indices.SP500.value.toLocaleString(undefined, { maximumFractionDigits: 2 }) : 'N/A'}
             <span className={indices?.SP500?.change! >= 0 ? 'text-positive ml-1' : 'text-negative ml-1'}>
@@ -71,20 +82,32 @@ const MarketOverviewCard: React.FC = () => {
           </span>
         </div>
         <div className="flex flex-col">
-          <span className="text-muted-foreground">Nasdaq</span>
+          <button
+            className={`text-muted-foreground text-left focus:outline-none ${selectedIndex === 'NASDAQCOM' ? 'underline font-semibold' : ''}`}
+            onClick={() => onSelectIndex && onSelectIndex('NASDAQCOM')}
+            type="button"
+          >
+            Nasdaq
+          </button>
           <span className="font-medium">
-            {indices?.NASDAQ?.value != null ? indices.NASDAQ.value.toLocaleString(undefined, { maximumFractionDigits: 2 }) : 'N/A'}
-            <span className={indices?.NASDAQ?.change! >= 0 ? 'text-positive ml-1' : 'text-negative ml-1'}>
-              ({indices?.NASDAQ?.percentChange != null ? (indices.NASDAQ.change! >= 0 ? '+' : '') + indices.NASDAQ.percentChange.toFixed(2) : 'N/A'}%)
+            {indices?.NASDAQCOM?.value != null ? indices.NASDAQCOM.value.toLocaleString(undefined, { maximumFractionDigits: 2 }) : 'N/A'}
+            <span className={indices?.NASDAQCOM?.change! >= 0 ? 'text-positive ml-1' : 'text-negative ml-1'}>
+              ({indices?.NASDAQCOM?.percentChange != null ? (indices.NASDAQCOM.change! >= 0 ? '+' : '') + indices.NASDAQCOM.percentChange.toFixed(2) : 'N/A'}%)
             </span>
           </span>
         </div>
         <div className="flex flex-col">
-          <span className="text-muted-foreground">Dow Jones</span>
+          <button
+            className={`text-muted-foreground text-left focus:outline-none ${selectedIndex === 'DJIA' ? 'underline font-semibold' : ''}`}
+            onClick={() => onSelectIndex && onSelectIndex('DJIA')}
+            type="button"
+          >
+            Dow Jones
+          </button>
           <span className="font-medium">
-            {indices?.DOWJONES?.value != null ? indices.DOWJONES.value.toLocaleString(undefined, { maximumFractionDigits: 2 }) : 'N/A'}
-            <span className={indices?.DOWJONES?.change! >= 0 ? 'text-positive ml-1' : 'text-negative ml-1'}>
-              ({indices?.DOWJONES?.percentChange != null ? (indices.DOWJONES.change! >= 0 ? '+' : '') + indices.DOWJONES.percentChange.toFixed(2) : 'N/A'}%)
+            {indices?.DJIA?.value != null ? indices.DJIA.value.toLocaleString(undefined, { maximumFractionDigits: 2 }) : 'N/A'}
+            <span className={indices?.DJIA?.change! >= 0 ? 'text-positive ml-1' : 'text-negative ml-1'}>
+              ({indices?.DJIA?.percentChange != null ? (indices?.DJIA?.change! >= 0 ? '+' : '') + indices.DJIA.percentChange.toFixed(2) : 'N/A'}%)
             </span>
           </span>
         </div>

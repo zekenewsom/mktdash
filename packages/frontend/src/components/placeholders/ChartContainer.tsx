@@ -1,22 +1,36 @@
 import React from 'react';
+import IndexChart from '../IndexChart';
 
 // Placeholder component for displaying interactive charts
-const ChartContainer: React.FC = () => {
+interface ChartContainerProps {
+  data: { date: string; value: number }[];
+  loading: boolean;
+  error: string | null;
+  indexName: string;
+}
+
+const ChartContainer: React.FC<ChartContainerProps> = ({
+  data,
+  loading,
+  error,
+  indexName,
+}) => {
   return (
-    <div className="bg-card text-card-foreground rounded-lg shadow p-4 h-96 flex flex-col">
-      <h2 className="text-xl font-semibold mb-2">Chart</h2>
-      {/* Placeholder for timeframe selection buttons */}
-      <div className="flex space-x-2 mb-4">
-        <button className="text-sm text-muted-foreground hover:text-foreground">1D</button>
-        <button className="text-sm text-muted-foreground hover:text-foreground">5D</button>
-        <button className="text-sm text-muted-foreground hover:text-foreground">1M</button>
-        <button className="text-sm text-muted-foreground hover:text-foreground">YTD</button>
-        <button className="text-sm text-foreground font-semibold">1Y</button> {/* Example active state */}
-        <button className="text-sm text-muted-foreground hover:text-foreground">5Y</button>
-        <button className="text-sm text-muted-foreground hover:text-foreground">MAX</button>
+    <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 flex flex-col items-center justify-center" style={{ maxWidth: '100%', minHeight: 400, maxHeight: 520, overflow: 'hidden' }}>
+      <div className="w-full flex flex-col items-start mb-2">
+        <h2 className="text-lg font-semibold text-slate-800 tracking-tight mb-1 pl-1">{indexName} Historical Performance</h2>
       </div>
-      <div className="flex-grow bg-muted flex items-center justify-center rounded">
-        <p className="text-muted-foreground">[Placeholder for Chart - Plotly.js or Chart.js]</p>
+      <div className="w-full flex-grow flex items-center justify-center" style={{ aspectRatio: '16/7', minHeight: 320, maxHeight: 420, overflow: 'hidden' }}>
+        {loading ? (
+          <span className="text-muted-foreground">Loading chart...</span>
+        ) : error ? (
+          <span className="text-red-600">{error}</span>
+        ) : (
+          <IndexChart
+            data={data}
+            indexName={indexName}
+          />
+        )}
       </div>
     </div>
   );
