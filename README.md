@@ -56,7 +56,21 @@ The project uses a simple monorepo-like structure with `packages/frontend` and `
         ```bash
         cp .env.example .env
         ```
-    * Edit `.env` to configure backend settings (e.g., port).
+    * Edit `.env` to configure backend settings (e.g., port) **and add your API keys for FRED and Alpha Vantage:**
+
+        - **FRED API Key:**
+            - Register for free at https://fred.stlouisfed.org/docs/api/api_key.html
+            - Paste the key into your `.env` as `FRED_API_KEY=...`
+        - **Alpha Vantage API Key:**
+            - Register for free at https://www.alphavantage.co/support/#api-key
+            - Paste the key into your `.env` as `ALPHAVANTAGE_API_KEY=...`
+
+    * Your `.env` should look like:
+        ```env
+        PORT=3001
+        FRED_API_KEY=your_fred_api_key_here
+        ALPHAVANTAGE_API_KEY=your_alpha_vantage_api_key_here
+        ```
 
 ## Running the Application
 

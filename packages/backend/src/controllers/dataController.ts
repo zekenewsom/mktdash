@@ -1,32 +1,36 @@
 import { Request, Response } from 'express';
 
 // Placeholder controller for fetching macroeconomic data
+import { fetchMacroData } from '../services/fredService';
+
 export const getMacroData = async (req: Request, res: Response) => {
-  console.log('Received request for macro data');
-  // In future phases, this will call services to fetch data from FRED, etc.
-  // For now, send a placeholder response
-  res.status(200).json({
-    message: 'Macro data endpoint hit (placeholder)',
-    data: {
-      // Mock data structure example
-      fedFundsRate: 5.25,
-      cpi: 3.4,
-      unemploymentRate: 3.9,
-    },
-  });
+  // Fetch macroeconomic indicators from FRED API via service
+  const seriesIds = ['FEDFUNDS', 'CPIAUCSL', 'UNRATE'];
+  try {
+    const result = await fetchMacroData(seriesIds);
+    if (result.error) {
+      // Return 500 with fallback/mock data and error message
+      return res.status(500).json({ error: result.error, data: result.data });
+    }
+    // Success: return the data
+    return res.status(200).json(result.data);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || 'Unknown error', data: null });
+  }
 };
 
 // Placeholder controller for fetching market index performance
+import { fetchIndexPerformance } from '../services/marketDataService';
+
 export const getMarketIndices = async (req: Request, res: Response) => {
-  console.log('Received request for market index data');
-  // In future phases, this will call services to fetch data from Alpha Vantage, Yahoo Finance, etc.
-  // For now, send a placeholder response
-  res.status(200).json({
-    message: 'Market indices endpoint hit (placeholder)',
-    data: [
-      { name: 'S&P 500', value: 5200, change: '+0.5%', changeValue: 26 },
-      { name: 'Nasdaq', value: 16300, change: '-0.1%', changeValue: -16 },
-      { name: 'Dow Jones', value: 39000, change: '+0.3%', changeValue: 117 },
-    ],
-  });
+  // Fetch market indices from Alpha Vantage (or fallback)
+  try {
+    const result = await fetchIndexPerformance();
+    if (result.error) {
+      return res.status(500).json({ error: result.error, data: result.data });
+    }
+    return res.status(200).json(result.data);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || 'Unknown error', data: null });
+  }
 };

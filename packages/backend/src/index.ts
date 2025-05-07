@@ -1,9 +1,7 @@
-import express from 'express';
 import dotenv from 'dotenv';
-import apiRoutes from './routes/api';
-
-// Load environment variables from .env file
 dotenv.config();
+import express from 'express';
+import apiRoutes from './routes/api';
 
 const app = express();
 const port = process.env.PORT || 3001; // Default to 3001 if PORT is not set
