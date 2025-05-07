@@ -1,0 +1,23 @@
+{
+    "name": "mktdash-root",
+    "version": "1.0.0",
+    "description": "Root package for the mktdash project",
+    "private": true,
+    "scripts": {
+      "start": "pnpm --parallel start",
+      "start:frontend": "pnpm --filter frontend dev",
+      "start:backend": "pnpm --filter backend dev"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {},
+    "pnpm": {
+      "peerDependencyRules": {
+        "ignoreMissing": [
+          "@babel/core",
+          "webpack"
+        ]
+      }
+    }
+  }
