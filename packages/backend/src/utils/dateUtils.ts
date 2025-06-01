@@ -93,6 +93,29 @@ export function calculateSMA(data: DataPoint[], period: number): number | null {
 }
 
 /**
+ * Calculates Simple Moving Average (SMA) series for given historical data.
+ * @param data Sorted array of DataPoints (ascending by date).
+ * @param period The number of data points to include in the SMA.
+ * @returns An array of DataPoints representing the SMA, or an empty array if not enough data.
+ * Each SMA point will have the date of the last point in its calculation window.
+ */
+export function calculateHistoricalSMA(data: DataPoint[], period: number): DataPoint[] {
+  if (!data || data.length < period) {
+    return [];
+  }
+  const smaSeries: DataPoint[] = [];
+  for (let i = period - 1; i < data.length; i++) {
+    const window = data.slice(i - period + 1, i + 1);
+    const sum = window.reduce((acc, point) => acc + point.value, 0);
+    smaSeries.push({
+      date: data[i].date,
+      value: parseFloat((sum / period).toFixed(4)),
+    });
+  }
+  return smaSeries;
+}
+
+/**
  * Filters data points within the last N days from a reference end date.
  * @param historicalData Sorted array of DataPoints (ascending by date).
  * @param endDate The reference end date.

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { DataPoint, findDataPointOnOrBefore, getPastDates, calculatePerformance, calculateSMA, getDataForLastNDays } from '../utils/dateUtils';
+import { DataPoint, findDataPointOnOrBefore, getPastDates, calculatePerformance, calculateSMA, calculateHistoricalSMA, getDataForLastNDays } from '../utils/dateUtils';
 
 const FRED_API_KEY = process.env.FRED_API_KEY;
 const FRED_BASE_URL = 'https://api.stlouisfed.org/fred/series/observations';
@@ -169,9 +169,12 @@ export async function getSeriesDetails(seriesId: string) {
 
     // --- NEW: Analytical Metrics Calculation ---
     const analyticalMetrics: Record<string, any> = {};
-    // Moving Averages
-    analyticalMetrics['sma50'] = calculateSMA(historicalData, 50);
-    analyticalMetrics['sma200'] = calculateSMA(historicalData, 200);
+    // Moving Averages (latest values for panel)
+    analyticalMetrics['latestSma50'] = calculateSMA(historicalData, 50);
+    analyticalMetrics['latestSma200'] = calculateSMA(historicalData, 200);
+    // Moving Averages (historical series for chart)
+    analyticalMetrics['historicalSma50'] = calculateHistoricalSMA(historicalData, 50);
+    analyticalMetrics['historicalSma200'] = calculateHistoricalSMA(historicalData, 200);
     // 52-Week High/Low (approx 365 days)
     const lastYearData = getDataForLastNDays(historicalData, currentDate, 365);
     if (lastYearData.length > 0) {

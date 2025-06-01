@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import IndexChart from '../components/IndexChart';
+import NewIndexChart, { DataPoint as ChartDataPoint } from '../components/NewIndexChart';
 import IndicatorHeader from '../components/Indicator/IndicatorHeader';
 import IndicatorMetricsTable from '../components/Indicator/IndicatorMetricsTable';
 import IndicatorAnalyticsPanel from '../components/Indicator/IndicatorAnalyticsPanel';
@@ -12,9 +12,16 @@ interface DataPointValue {
   date: string;
   value: number;
 }
+interface DataPointValue {
+  date: string;
+  value: number;
+}
+
 interface AnalyticalMetricsData {
-  sma50?: number | null;
-  sma200?: number | null;
+  latestSma50?: number | null;
+  latestSma200?: number | null;
+  historicalSma50?: DataPointValue[] | null;
+  historicalSma200?: DataPointValue[] | null;
   yearlyHigh?: DataPointValue | null;
   yearlyLow?: DataPointValue | null;
 }
@@ -95,16 +102,23 @@ const IndicatorDetailPage: React.FC = () => {
         seriesId={seriesId || 'N/A'}
       />
       <div className="bg-card p-1 rounded-lg shadow">
-         <IndexChart
-            data={chartData}
-            indexName={chartName}
-            loading={false}
-            error={null}
+        <NewIndexChart
+          data={chartData as ChartDataPoint[]}
+          indexName={chartName}
+          sma50Data={Array.isArray(seriesData.analyticalMetrics?.historicalSma50) ? seriesData.analyticalMetrics?.historicalSma50 : undefined}
+          sma200Data={Array.isArray(seriesData.analyticalMetrics?.historicalSma200) ? seriesData.analyticalMetrics?.historicalSma200 : undefined}
+          loading={false}
+          error={null}
         />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <IndicatorMetricsTable metrics={seriesData.metrics} />
-        <IndicatorAnalyticsPanel metrics={seriesData.analyticalMetrics} />
+        <IndicatorAnalyticsPanel metrics={{
+          sma50: seriesData.analyticalMetrics?.latestSma50,
+          sma200: seriesData.analyticalMetrics?.latestSma200,
+          yearlyHigh: seriesData.analyticalMetrics?.yearlyHigh,
+          yearlyLow: seriesData.analyticalMetrics?.yearlyLow,
+        }} />
       </div>
       {seriesData.seriesInfo?.notes && (
         <div className="p-4 bg-card text-card-foreground rounded-lg shadow mt-6">
