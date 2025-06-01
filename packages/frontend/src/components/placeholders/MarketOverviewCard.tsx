@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+
 interface MacroData {
   FEDFUNDS?: { value: number; date: string };
   CPIAUCSL?: { value: number; date: string };

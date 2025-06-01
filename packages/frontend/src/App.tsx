@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import MarketsPage from './pages/MarketsPage';
 import EconomicPage from './pages/EconomicPage';
 import FinancialStabilityPage from './pages/FinancialStabilityPage';
+import IndicatorDetailPage from './pages/IndicatorDetailPage';
 
 function App() {
   // You might add context providers (e.g., for theme, data) here later
@@ -17,6 +18,7 @@ function App() {
       <main className="container mx-auto p-4 pt-0">
         <Routes>
           <Route path="/" element={<MarketsPage />} />
+          <Route path="/series/:seriesId" element={<IndicatorDetailPage />} />
           <Route path="/economic" element={<EconomicPage />} />
           <Route path="/stability" element={<FinancialStabilityPage />} />
         </Routes>
