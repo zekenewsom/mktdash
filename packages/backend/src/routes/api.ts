@@ -3,6 +3,7 @@ import { getMacroData, getMarketIndices, getIndexHistory, getSeriesHistory, getS
 import { generateDailyReport } from '../controllers/reportController';
 import { getSingleCryptoDetails } from '../controllers/cryptoController';
 import { getHomeSnapshot } from '../controllers/overviewController';
+import { getCalendarEvents } from '../controllers/calendarController';
 
 const router = Router();
 
@@ -21,6 +22,9 @@ router.get('/history', getSeriesHistory);
 router.get('/series/:seriesId', getSingleSeriesDetails);
 // --- NEW CRYPTO ROUTE ---
 router.get('/crypto/:cryptoId', getSingleCryptoDetails);
+
+// Economic Calendar Route - NEW
+router.get('/calendar/events', getCalendarEvents);
 
 // Placeholder route to trigger daily report generation (can be called manually for testing)
 router.post('/report/generate', generateDailyReport);
