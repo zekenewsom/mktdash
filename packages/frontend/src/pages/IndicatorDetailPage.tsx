@@ -1,29 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import NewIndexChart, { DataPoint as ChartDataPoint } from '../components/NewIndexChart';
+import NewIndexChart from '../components/NewIndexChart';
+
 import IndicatorHeader from '../components/Indicator/IndicatorHeader';
 import IndicatorMetricsTable from '../components/Indicator/IndicatorMetricsTable';
 import IndicatorAnalyticsPanel from '../components/Indicator/IndicatorAnalyticsPanel';
 import { Button } from "../components/ui/button";
 import { ArrowLeft } from 'lucide-react';
 
-interface DataPointValue {
-  date: string;
-  value: number;
-}
-interface DataPointValue {
-  date: string;
-  value: number;
-}
-
 interface AnalyticalMetricsData {
   latestSma50?: number | null;
   latestSma200?: number | null;
-  historicalSma50?: DataPointValue[] | null;
-  historicalSma200?: DataPointValue[] | null;
-  yearlyHigh?: DataPointValue | null;
-  yearlyLow?: DataPointValue | null;
+  historicalSma50?: { date: string; value: number }[] | null;
+  historicalSma200?: { date: string; value: number }[] | null;
+  yearlyHigh?: { date: string; value: number } | null;
+  yearlyLow?: { date: string; value: number } | null;
 }
 
 interface SeriesData {
@@ -35,7 +27,13 @@ interface SeriesData {
 }
 
 const IndicatorDetailPage: React.FC = () => {
+  const location = useLocation();
   const { seriesId } = useParams<{ seriesId: string }>();
+  // Determine indicator type (series or crypto)
+  const routeType = location.state?.type as 'series' | 'crypto' | undefined;
+  // Heuristic fallback: if id is all lowercase and matches a known crypto, treat as crypto
+  const knownCryptos = ['bitcoin', 'ethereum', 'cardano'];
+  const inferredType = routeType || (seriesId && knownCryptos.includes(seriesId.toLowerCase()) ? 'crypto' : 'series');
   const navigate = useNavigate();
   const [seriesData, setSeriesData] = useState<SeriesData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -52,7 +50,12 @@ const IndicatorDetailPage: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`/api/series/${seriesId}`);
+        let response;
+        if (inferredType === 'crypto') {
+          response = await axios.get(`/api/crypto/${seriesId}`);
+        } else {
+          response = await axios.get(`/api/series/${seriesId}`);
+        }
         if (response.data.error && !response.data.data) {
           setError(response.data.error);
           setSeriesData(null);
@@ -68,7 +71,7 @@ const IndicatorDetailPage: React.FC = () => {
     };
 
     fetchData();
-  }, [seriesId]);
+  }, [seriesId, inferredType]);
 
   if (loading) {
     return <div className="flex justify-center items-center h-64 text-muted-foreground">Loading indicator details...</div>;
@@ -89,7 +92,7 @@ const IndicatorDetailPage: React.FC = () => {
   }
 
   const chartData = seriesData.historical || [];
-  const chartName = seriesData.seriesInfo?.title || seriesId || 'Indicator';
+  const chartName = seriesData.seriesInfo?.title || seriesData.seriesInfo?.name || seriesId || 'Indicator';
 
   return (
     <div className="space-y-6">
@@ -101,9 +104,11 @@ const IndicatorDetailPage: React.FC = () => {
         currentValue={seriesData.currentValue}
         seriesId={seriesId || 'N/A'}
       />
+
+
       <div className="bg-card p-1 rounded-lg shadow">
         <NewIndexChart
-          data={chartData as ChartDataPoint[]}
+          data={chartData as { date: string; value: number }[]}
           indexName={chartName}
           sma50Data={Array.isArray(seriesData.analyticalMetrics?.historicalSma50) ? seriesData.analyticalMetrics?.historicalSma50 : undefined}
           sma200Data={Array.isArray(seriesData.analyticalMetrics?.historicalSma200) ? seriesData.analyticalMetrics?.historicalSma200 : undefined}

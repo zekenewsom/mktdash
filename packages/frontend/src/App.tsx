@@ -19,6 +19,7 @@ function App() {
         <Routes>
           <Route path="/" element={<MarketsPage />} />
           <Route path="/series/:seriesId" element={<IndicatorDetailPage />} />
+          <Route path="/crypto/:seriesId" element={<IndicatorDetailPage />} />
           <Route path="/economic" element={<EconomicPage />} />
           <Route path="/stability" element={<FinancialStabilityPage />} />
         </Routes>

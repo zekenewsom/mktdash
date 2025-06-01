@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getMacroData, getMarketIndices, getIndexHistory, getSeriesHistory, getSingleSeriesDetails } from '../controllers/dataController';
 import { generateDailyReport } from '../controllers/reportController';
+import { getSingleCryptoDetails } from '../controllers/cryptoController';
 
 const router = Router();
 
@@ -14,6 +15,8 @@ router.get('/history', getSeriesHistory);
 
 // New: Detailed FRED series endpoint
 router.get('/series/:seriesId', getSingleSeriesDetails);
+// --- NEW CRYPTO ROUTE ---
+router.get('/crypto/:cryptoId', getSingleCryptoDetails);
 
 // Placeholder route to trigger daily report generation (can be called manually for testing)
 router.post('/report/generate', generateDailyReport);
