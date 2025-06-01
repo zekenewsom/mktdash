@@ -2,8 +2,12 @@ import { Router } from 'express';
 import { getMacroData, getMarketIndices, getIndexHistory, getSeriesHistory, getSingleSeriesDetails } from '../controllers/dataController';
 import { generateDailyReport } from '../controllers/reportController';
 import { getSingleCryptoDetails } from '../controllers/cryptoController';
+import { getHomeSnapshot } from '../controllers/overviewController';
 
 const router = Router();
+
+// Home Overview Snapshot
+router.get('/overview/snapshot', getHomeSnapshot);
 
 // Placeholder route for fetching macroeconomic data
 router.get('/macro', getMacroData);

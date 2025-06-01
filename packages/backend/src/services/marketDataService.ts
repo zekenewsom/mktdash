@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { fetchWithRetry } from '../utils/fetchWithRetry';
+import { connectRedis, getCache, setCache } from '../utils/redis';
 import { DataPoint, findDataPointOnOrBefore, getPastDates, calculatePerformance, calculateSMA, calculateHistoricalSMA, getDataForLastNDays } from '../utils/dateUtils';
 
 const FRED_API_KEY = process.env.FRED_API_KEY;
@@ -22,7 +24,7 @@ async function fetchFredIndex(seriesId: string) {
   const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
   const url = `${FRED_BASE_URL}?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json&observation_end=${today}`;
   try {
-    const resp = await axios.get(url);
+    const resp = await fetchWithRetry(url);
     const obsArr = resp.data.observations || [];
     const obs = obsArr.length > 0 ? obsArr[obsArr.length - 1] : undefined;
     if (obs && obs.value !== '.') {
@@ -47,7 +49,7 @@ export async function fetchIndexPerformance() {
       const today = new Date().toISOString().slice(0, 10);
       const url = `${FRED_BASE_URL}?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json&observation_end=${today}`;
       try {
-        const resp = await axios.get(url);
+        const resp = await fetchWithRetry(url);
         const obsArr = resp.data.observations || [];
         const n = obsArr.length;
         if (n > 1) {
@@ -81,6 +83,17 @@ export async function fetchIndexPerformance() {
 
 // Fetch historical data for any FRED series with in-memory caching
 export async function fetchFredSeriesHistory(seriesId: string, forceRefresh: boolean = false): Promise<{ data: DataPoint[]; error: string | null; cached: boolean; seriesInfo?: any }> {
+  await connectRedis();
+  const cacheKey = `fred:series:${seriesId}`;
+  if (!forceRefresh) {
+    const cached = await getCache(cacheKey);
+    if (cached) {
+      console.log(`[Redis] FRED cache hit for ${cacheKey}`);
+      return { ...cached, cached: true };
+    } else {
+      console.log(`[Redis] FRED cache miss for ${cacheKey}`);
+    }
+  }
   const now = Date.now();
   if (
     !forceRefresh &&
@@ -95,8 +108,8 @@ export async function fetchFredSeriesHistory(seriesId: string, forceRefresh: boo
 
   try {
     const [seriesInfoRes, observationsRes] = await Promise.all([
-        axios.get(seriesUrl),
-        axios.get(observationsUrl)
+        fetchWithRetry(seriesUrl),
+        fetchWithRetry(observationsUrl)
     ]);
     
     const seriesInfo = seriesInfoRes.data.seriess && seriesInfoRes.data.seriess.length > 0 ? seriesInfoRes.data.seriess[0] : {};
@@ -192,7 +205,7 @@ export async function getSeriesDetails(seriesId: string) {
     }
     // --- End of Analytical Metrics ---
 
-    return {
+    const result = {
       data: {
         seriesInfo: {
             id: seriesInfo.id,
@@ -210,6 +223,7 @@ export async function getSeriesDetails(seriesId: string) {
       },
       error: historyResult.error,
     };
+    return result;
 
   } catch (err: any) {
     console.error(`Error in getSeriesDetails for ${seriesId}:`, err);

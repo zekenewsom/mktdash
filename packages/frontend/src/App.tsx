@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import HomePage from './pages/HomePage';
 import MarketsPage from './pages/MarketsPage';
 import EconomicPage from './pages/EconomicPage';
 import FinancialStabilityPage from './pages/FinancialStabilityPage';
@@ -18,8 +19,8 @@ function App() {
       <main className="container mx-auto p-4 pt-0">
         <Routes>
           <Route path="/" element={<MarketsPage />} />
+          <Route path="/home" element={<HomePage />} />
           <Route path="/series/:seriesId" element={<IndicatorDetailPage />} />
-          <Route path="/crypto/:seriesId" element={<IndicatorDetailPage />} />
           <Route path="/economic" element={<EconomicPage />} />
           <Route path="/stability" element={<FinancialStabilityPage />} />
         </Routes>

@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { cn } from '../lib/utils';
 
+
 const Navbar: React.FC = () => {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
@@ -21,7 +22,10 @@ const Navbar: React.FC = () => {
             </NavLink>
           </div>
           <div className="flex space-x-4">
-            <NavLink to="/" className={linkClass}>
+            <NavLink to="/home" className={linkClass} end>
+              Home
+            </NavLink>
+            <NavLink to="/" className={linkClass} end>
               Markets
             </NavLink>
             <NavLink to="/economic" className={linkClass}>
