@@ -17,7 +17,7 @@ const SERIES_LABELS: Record<string, string> = {
   UNRATE: 'Unemployment Rate',
 };
 
-const DashboardPage: React.FC = () => {
+const MarketsPage: React.FC = () => {
   // In future phases, state management for widget layout will go here
   // For now, use a simple grid structure
 
@@ -91,4 +91,4 @@ const DashboardPage: React.FC = () => {
   );
 };
 
-export default DashboardPage;
+export default MarketsPage;
