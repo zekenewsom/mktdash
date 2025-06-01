@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, Landmark, Home, BarChartHorizontalBig, AlertTriangle, Car, Ban } from 'lucide-react';
+import { TrendingUp, Landmark, Home, BarChartHorizontalBig, AlertTriangle, Car, Ban, Scale, ShieldCheck, Building } from 'lucide-react';
 
 interface StabilityIndicatorInfo {
   id: string;
@@ -97,14 +97,42 @@ const STABILITY_INDICATORS: StabilityIndicatorInfo[] = [
     fredId: 'USNIM',
   },
 
-  // --- Placeholders for other categories ---
+  // Category: Debt Ratios Monitor (High Debt-to-Income Ratios)
   {
-    id: 'placeholder-debt-ratios',
-    name: 'Debt-to-Income Ratios Overview',
-    description: 'Household, corporate, and government debt levels relative to income/GDP.',
+    id: 'household-dsr',
+    name: 'Household Debt Service Ratio',
+    description: 'Household debt service payments as a percent of disposable personal income.',
     categoryKey: 'debtRatios',
     categoryDisplay: 'Debt Ratios Monitor',
-    fredId: '',
+    icon: Home, // Icon for household related
+    fredId: 'TDSP',
+  },
+  {
+    id: 'federal-debt-gdp',
+    name: 'Federal Debt to GDP Ratio',
+    description: 'Federal debt held by the public as a percentage of Gross Domestic Product.',
+    categoryKey: 'debtRatios',
+    categoryDisplay: 'Debt Ratios Monitor',
+    icon: Scale, // Icon for ratio/balance
+    fredId: 'FYGFGDQ188S', // Federal Debt Held by the Public as Percent of GDP
+  },
+  {
+    id: 'total-public-debt-gdp',
+    name: 'Total Public Debt to GDP Ratio',
+    description: 'Total public debt as a percentage of Gross Domestic Product.',
+    categoryKey: 'debtRatios',
+    categoryDisplay: 'Debt Ratios Monitor',
+    icon: Landmark, // Icon for government related
+    fredId: 'GFDEGDQ188S',
+  },
+  {
+    id: 'corp-debt-level',
+    name: 'Nonfinancial Corporate Debt Level',
+    description: 'Levels of debt securities and loans for nonfinancial corporate businesses. (Note: Debt-to-EBITDA ratio is hard to source freely).',
+    categoryKey: 'debtRatios',
+    categoryDisplay: 'Debt Ratios Monitor',
+    icon: Building, // Icon for corporate
+    fredId: 'NCBDBILQ027S',
   },
   {
     id: 'placeholder-asset-values',

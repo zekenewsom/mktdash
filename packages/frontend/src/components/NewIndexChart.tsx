@@ -1,11 +1,10 @@
 import React, { useMemo, useEffect, useState, useRef } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { graphic } from 'echarts/core';
-import { Button } from '@/components/ui/button';
+import { Button } from './ui/button';
 import { LineChart as LineChartIcon, Trash2, Hand } from 'lucide-react';
 
-// DataPoint type
-export interface DataPoint {
+interface DataPoint {
   date: string;
   value: number;
 }
@@ -30,6 +29,16 @@ interface ChartThemeColors {
   primaryGradientEnd: string;
   sma50Color?: string;
   sma200Color?: string;
+  drawingLineColor?: string;
+}
+
+type DrawingTool = 'none' | 'trendline';
+interface DrawnLine {
+  id: string;
+  type: 'trendline';
+  start: DataPoint;
+  end: DataPoint;
+  color: string;
 }
 
 const NewIndexChart: React.FC<NewIndexChartProps> = ({
@@ -41,6 +50,13 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
   error,
 }) => {
   const [chartColors, setChartColors] = useState<ChartThemeColors | null>(null);
+  const echartsRef = useRef<any>(null);
+
+  // Drawing State
+  const [activeTool, setActiveTool] = useState<DrawingTool>('none');
+  const [tempLinePoints, setTempLinePoints] = useState<DataPoint[]>([]);
+  const [drawnLines, setDrawnLines] = useState<DrawnLine[]>([]);
+  const [mouseMoveParams, setMouseMoveParams] = useState<any>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -53,9 +69,7 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
         const s = parseFloat(parts[1].replace('%',''));
         const l = parseFloat(parts[2].replace('%',''));
         return {
-          h,
-          s,
-          l,
+          h, s, l,
           string: `hsl(${h}, ${s}%, ${l}%)`,
           rgbaString: (alpha: number) => `hsla(${h}, ${s}%, ${l}%, ${alpha})`,
         };
@@ -67,6 +81,7 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
       const cardParsed = parseHslValue('--card', 'white');
       const sma50Color = rootStyle.getPropertyValue('--chart-2').trim() ? `hsl(${rootStyle.getPropertyValue('--chart-2').trim().split(' ').join(', ')})` : 'orange';
       const sma200Color = rootStyle.getPropertyValue('--chart-3').trim() ? `hsl(${rootStyle.getPropertyValue('--chart-3').trim().split(' ').join(', ')})` : 'purple';
+      const drawingLineColor = rootStyle.getPropertyValue('--chart-4').trim() ? `hsl(${rootStyle.getPropertyValue('--chart-4').trim().split(' ').join(', ')})` : '#FF6347';
       setChartColors({
         primary: primaryParsed.string,
         primaryRgb: { h: primaryParsed.h, s: primaryParsed.s, l: primaryParsed.l },
@@ -78,17 +93,54 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
         primaryGradientEnd: primaryParsed.rgbaString(0.01),
         sma50Color: sma50Color,
         sma200Color: sma200Color,
+        drawingLineColor: drawingLineColor,
       });
     }
   }, []);
 
+  const handleChartClick = (params: any) => {
+    if (activeTool === 'none' || !chartColors) return;
+    const echartsInstance = echartsRef.current?.getEchartsInstance();
+    if (!echartsInstance) return;
+    const clickCoords = [params.offsetX, params.offsetY];
+    const dataCoord = echartsInstance.convertFromPixel({ gridIndex: 0 }, clickCoords);
+    if (!dataCoord) return;
+    const xIndex = Math.round(dataCoord[0]);
+    const dates = data.map(d => d.date);
+    if (xIndex < 0 || xIndex >= dates.length) return;
+    const clickedDate = dates[xIndex];
+    const clickedValue = dataCoord[1];
+    const currentDataPoint: DataPoint = { date: clickedDate, value: parseFloat(clickedValue.toFixed(2)) };
+    if (activeTool === 'trendline') {
+      const newTempPoints = [...tempLinePoints, currentDataPoint];
+      if (newTempPoints.length === 1) {
+        setTempLinePoints(newTempPoints);
+      } else if (newTempPoints.length === 2) {
+        setDrawnLines((prevLines) => [
+          ...prevLines,
+          {
+            id: `line-${Date.now()}`,
+            type: 'trendline',
+            start: newTempPoints[0],
+            end: newTempPoints[1],
+            color: chartColors.drawingLineColor || 'red',
+          },
+        ]);
+        setTempLinePoints([]);
+      }
+    }
+  };
+
+  const clearDrawing = () => {
+    setDrawnLines([]);
+    setTempLinePoints([]);
+    setActiveTool('none');
+  };
+
   const option = useMemo(() => {
     if (!chartColors || !data || data.length === 0) {
       return {
-        title: {
-          text: `${indexName} Historical Performance`,
-          textStyle: { color: chartColors?.foreground || '#333' },
-        },
+        title: { text: `${indexName} Historical Performance`, textStyle: { color: chartColors?.foreground || '#333' } },
         grid: { containLabel: true },
       };
     }
@@ -140,6 +192,62 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
         lineStyle: { width: 1.5, color: chartColors.sma200Color || 'purple', type: 'dotted' },
         emphasis: { focus: 'series', lineStyle: { width: 2 } },
       });
+    }
+    // Drawn lines custom series
+    if (drawnLines.length > 0) {
+      seriesConfig.push({
+        type: 'custom',
+        name: 'User Drawings',
+        renderItem: (params: any, api: any) => {
+          const currentLine = drawnLines[params.dataIndex];
+          if (!currentLine) return;
+          const startXIndex = dates.indexOf(currentLine.start.date);
+          const endXIndex = dates.indexOf(currentLine.end.date);
+          if (startXIndex === -1 || endXIndex === -1) return;
+          const startPx = api.coord([startXIndex, currentLine.start.value]);
+          const endPx = api.coord([endXIndex, currentLine.end.value]);
+          if (!startPx || !endPx) return;
+          return {
+            type: 'line',
+            shape: {
+              x1: startPx[0], y1: startPx[1],
+              x2: endPx[0], y2: endPx[1],
+            },
+            style: {
+              stroke: currentLine.color || chartColors.drawingLineColor || 'red',
+              lineWidth: 2,
+            },
+            z: 100,
+          };
+        },
+        data: drawnLines,
+        clip: true,
+      });
+    }
+    // Drawing preview
+    if (activeTool === 'trendline' && tempLinePoints.length === 1 && mouseMoveParams && chartColors) {
+      const echartsInstance = echartsRef.current?.getEchartsInstance();
+      if (echartsInstance) {
+        const startDataPoint = tempLinePoints[0];
+        const startXIndex = dates.indexOf(startDataPoint.date);
+        if (startXIndex !== -1) {
+          const startPx = echartsInstance.convertToPixel({ gridIndex: 0 }, [startXIndex, startDataPoint.value]);
+          const currentMousePx = [mouseMoveParams.offsetX, mouseMoveParams.offsetY];
+          if (startPx) {
+            seriesConfig.push({
+              type: 'custom',
+              name: 'Drawing Preview',
+              renderItem: () => ({
+                type: 'line',
+                shape: { x1: startPx[0], y1: startPx[1], x2: currentMousePx[0], y2: currentMousePx[1] },
+                style: { stroke: chartColors.drawingLineColor || 'rgba(255,0,0,0.5)', lineWidth: 1, lineDash: [3, 3] },
+                z: 99,
+              }),
+              data: [{ value: 1 }],
+            });
+          }
+        }
+      }
     }
     return {
       title: {
@@ -205,14 +313,8 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
           },
           bottom: '5%',
           height: 20,
-          dataBackground: {
-            lineStyle: { color: chartColors.mutedForeground, opacity: 0.3 },
-            areaStyle: { color: chartColors.mutedForeground, opacity: 0.1 },
-          },
-          selectedDataBackground: {
-            lineStyle: { color: chartColors.primary, opacity: 0.7 },
-            areaStyle: { color: chartColors.primary, opacity: 0.3 },
-          },
+          dataBackground: { lineStyle: { color: chartColors.mutedForeground, opacity: 0.3 }, areaStyle: { color: chartColors.mutedForeground, opacity: 0.1 } },
+          selectedDataBackground: { lineStyle: { color: chartColors.primary, opacity: 0.7 }, areaStyle: { color: chartColors.primary, opacity: 0.3 } },
           fillerColor: `hsla(${chartColors.primaryRgb.h}, ${chartColors.primaryRgb.s}%, ${chartColors.primaryRgb.l}%, 0.2)`,
         },
       ],
@@ -227,7 +329,16 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
       animationDuration: 400,
       animationEasing: 'cubicInOut',
     };
-  }, [data, indexName, chartColors, sma50Data, sma200Data]);
+  }, [data, indexName, chartColors, sma50Data, sma200Data, drawnLines, activeTool, tempLinePoints, mouseMoveParams]);
+
+  const onEvents = {
+    click: handleChartClick,
+    mousemove: (params: any) => {
+      if (activeTool === 'trendline' && tempLinePoints.length === 1) {
+        setMouseMoveParams(params);
+      }
+    },
+  };
 
   if (loading) {
     return <div className="flex items-center justify-center h-full text-muted-foreground">Loading chart...</div>;
@@ -243,12 +354,46 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
   }
 
   return (
-    <ReactECharts
-      option={option}
-      style={{ height: '100%', width: '100%', minHeight: 400, maxHeight: 500 }}
-      notMerge={true}
-      lazyUpdate={true}
-    />
+    <div>
+      {/* Toolbar for drawing tools */}
+      <div className="mb-2 flex space-x-2 p-2 bg-card rounded shadow-sm border border-border">
+        <Button
+          variant={activeTool === 'none' ? 'secondary' : 'outline'}
+          size="sm"
+          onClick={() => {
+            setActiveTool('none');
+            setTempLinePoints([]);
+          }}
+          title="Default cursor"
+        >
+          <Hand className="h-4 w-4" />
+        </Button>
+        <Button
+          variant={activeTool === 'trendline' ? 'secondary' : 'outline'}
+          size="sm"
+          onClick={() => {
+            setActiveTool('trendline');
+            setTempLinePoints([]);
+          }}
+          title="Draw Trend Line"
+        >
+          <LineChartIcon className="h-4 w-4" />
+        </Button>
+        {drawnLines.length > 0 && (
+          <Button variant="destructive" size="sm" onClick={clearDrawing} title="Clear Drawings">
+            <Trash2 className="h-4 w-4 mr-1" /> Clear All
+          </Button>
+        )}
+      </div>
+      <ReactECharts
+        ref={echartsRef}
+        option={option}
+        style={{ height: '100%', width: '100%', minHeight: 400, maxHeight: 500 }}
+        notMerge={false}
+        lazyUpdate={true}
+        onEvents={onEvents}
+      />
+    </div>
   );
 };
 
