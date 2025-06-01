@@ -152,7 +152,9 @@ export async function getCryptoDetails(cryptoId: string, vsCurrency: string = 'u
       },
       error: null,
     };
-    await setCache(cacheKey, result, 60); // Cache for 60 seconds
+    // Use configurable TTL from env or default to 60s
+    const ttl = Number(process.env.COINGECKO_CACHE_TTL) || 60; // Use configurable TTL from env or default to 60s
+    await setCache(cacheKey, result, ttl); // Cache for ttl seconds
     return result;
 
   } catch (err: any) {

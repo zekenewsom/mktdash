@@ -120,6 +120,9 @@ export async function fetchFredSeriesHistory(seriesId: string, forceRefresh: boo
       .map((obs: any) => ({ date: obs.date, value: parseFloat(obs.value) }));
 
     indexHistoryCache[seriesId] = { data: historicalData, lastFetched: now, seriesInfo };
+    // Use configurable TTL from env or default to 86400s (24h)
+    const historyTtl = Number(process.env.FRED_HISTORY_CACHE_TTL) || 86400;
+    await setCache(cacheKey, { data: historicalData, seriesInfo }, historyTtl); // Cache for historyTtl seconds
     return { data: historicalData, error: null, cached: false, seriesInfo };
   } catch (err: any) {
     console.error('FRED fetch error for series history', seriesId, ':', err.message);
