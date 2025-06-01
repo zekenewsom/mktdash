@@ -1,15 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, Landmark, Home, BarChartHorizontalBig, BarChart3 } from 'lucide-react';
+import { TrendingUp, Landmark, Home, BarChartHorizontalBig, AlertTriangle, Car, Ban } from 'lucide-react';
 
 interface StabilityIndicatorInfo {
   id: string;
   name: string;
   description: string;
-  category: string;
+  categoryKey: string;
+  categoryDisplay: string;
   icon?: React.ElementType;
   fredId?: string;
 }
+
+const STABILITY_CATEGORIES: { key: string; display: string; emoji?: string; }[] = [
+  { key: 'interestRates', display: 'Interest Rates Monitor', emoji: '🚨' },
+  { key: 'defaultRates', display: 'Default & Delinquency Monitor', emoji: '📉' },
+  { key: 'debtRatios', display: 'Debt Ratios Monitor', emoji: '⚖️' },
+  { key: 'assetValues', display: 'Asset Valuations (Stability)', emoji: '🏘️' },
+  { key: 'liquidity', display: 'Liquidity Monitor', emoji: '💧' },
+];
 
 const STABILITY_INDICATORS: StabilityIndicatorInfo[] = [
   // Category: Interest Rates Monitor
@@ -17,7 +26,8 @@ const STABILITY_INDICATORS: StabilityIndicatorInfo[] = [
     id: 'fedfunds',
     name: 'Federal Funds Effective Rate',
     description: 'The target rate set by the FOMC for interbank lending of reserves.',
-    category: 'Interest Rates Monitor',
+    categoryKey: 'interestRates',
+    categoryDisplay: 'Interest Rates Monitor',
     icon: Landmark,
     fredId: 'FEDFUNDS',
   },
@@ -25,7 +35,8 @@ const STABILITY_INDICATORS: StabilityIndicatorInfo[] = [
     id: '10y-treasury',
     name: '10-Year Treasury Yield',
     description: 'Yield on the 10-year U.S. Treasury note, a benchmark for long-term interest rates.',
-    category: 'Interest Rates Monitor',
+    categoryKey: 'interestRates',
+    categoryDisplay: 'Interest Rates Monitor',
     icon: TrendingUp,
     fredId: 'DGS10',
   },
@@ -33,7 +44,8 @@ const STABILITY_INDICATORS: StabilityIndicatorInfo[] = [
     id: 'corp-bond-yield',
     name: 'US Corporate Bond Effective Yield',
     description: 'ICE BofA US Corporate Index Effective Yield, representing investment-grade corporate debt.',
-    category: 'Interest Rates Monitor',
+    categoryKey: 'interestRates',
+    categoryDisplay: 'Interest Rates Monitor',
     icon: BarChartHorizontalBig,
     fredId: 'BAMLC0A0CM',
   },
@@ -41,50 +53,78 @@ const STABILITY_INDICATORS: StabilityIndicatorInfo[] = [
     id: 'mortgage-30y',
     name: '30-Year Fixed Mortgage Rate',
     description: 'Average rate for a 30-year fixed-rate mortgage in the U.S.',
-    category: 'Interest Rates Monitor',
+    categoryKey: 'interestRates',
+    categoryDisplay: 'Interest Rates Monitor',
     icon: Home,
     fredId: 'MORTGAGE30US',
   },
-  // --- Placeholders for other categories ---
+
+  // Category: Default & Delinquency Monitor
   {
-    id: 'placeholder-default-rates',
-    name: 'Default Rates Overview',
-    description: 'Key metrics on consumer, mortgage, and corporate defaults.',
-    category: 'Increasing Default Rates',
-    fredId: '',
+    id: 'cc-delinquency',
+    name: 'Credit Card Delinquency Rate',
+    description: 'Delinquency rate on credit card loans from all commercial banks.',
+    categoryKey: 'defaultRates',
+    categoryDisplay: 'Default & Delinquency Monitor',
+    icon: AlertTriangle,
+    fredId: 'DRCCLACBS',
   },
+  {
+    id: 'auto-delinquency',
+    name: 'Auto Loan Delinquency Rate',
+    description: 'Delinquency rate on auto loans from all commercial banks.',
+    categoryKey: 'defaultRates',
+    categoryDisplay: 'Default & Delinquency Monitor',
+    icon: Car,
+    fredId: 'DRALACBS',
+  },
+  {
+    id: 'mortgage-delinquency',
+    name: 'Mortgage Delinquency Rate',
+    description: 'Delinquency rate on single-family residential mortgages.',
+    categoryKey: 'defaultRates',
+    categoryDisplay: 'Default & Delinquency Monitor',
+    icon: Home,
+    fredId: 'DRSFRMACBS',
+  },
+  {
+    id: 'bank-npl-ratio',
+    name: 'Bank Non-Performing Loans Ratio',
+    description: 'Nonperforming loans (90+ days past due + nonaccrual) to total loans for U.S. banks.',
+    categoryKey: 'defaultRates',
+    categoryDisplay: 'Default & Delinquency Monitor',
+    icon: Ban,
+    fredId: 'USNIM',
+  },
+
+  // --- Placeholders for other categories ---
   {
     id: 'placeholder-debt-ratios',
     name: 'Debt-to-Income Ratios Overview',
     description: 'Household, corporate, and government debt levels relative to income/GDP.',
-    category: 'High Debt-to-Income Ratios',
+    categoryKey: 'debtRatios',
+    categoryDisplay: 'Debt Ratios Monitor',
     fredId: '',
   },
   {
     id: 'placeholder-asset-values',
     name: 'Asset Value Trends (Stability)',
     description: 'Monitoring stock market, housing, and commercial real estate for sharp declines.',
-    category: 'Declining Asset Values',
+    categoryKey: 'assetValues',
+    categoryDisplay: 'Asset Valuations (Stability)',
     fredId: '',
   },
   {
     id: 'placeholder-liquidity',
     name: 'Market Liquidity Monitor',
     description: 'Indicators of stress in short-term funding markets and banking system liquidity.',
-    category: 'Reduced Liquidity',
+    categoryKey: 'liquidity',
+    categoryDisplay: 'Liquidity Monitor',
     fredId: '',
   },
 ];
 
 const FinancialStabilityPage: React.FC = () => {
-  const categories = [
-    'Interest Rates Monitor',
-    'Increasing Default Rates',
-    'High Debt-to-Income Ratios',
-    'Declining Asset Values',
-    'Reduced Liquidity',
-  ];
-
   return (
     <div className="space-y-8">
       <div>
@@ -94,22 +134,18 @@ const FinancialStabilityPage: React.FC = () => {
         </p>
       </div>
 
-      {categories.map((categoryName) => (
-        <section key={categoryName} className="pt-2">
+      {STABILITY_CATEGORIES.map((category) => (
+        <section key={category.key} className="pt-2">
           <h2 className="text-2xl font-semibold tracking-tight mb-4 pb-2 border-b border-border text-foreground">
-            {categoryName === 'Interest Rates Monitor' && '🚨 '}
-            {categoryName === 'Increasing Default Rates' && '📉 '}
-            {categoryName === 'High Debt-to-Income Ratios' && '⚖️ '}
-            {categoryName === 'Declining Asset Values' && '📉 '}
-            {categoryName === 'Reduced Liquidity' && '💧 '}
-            {categoryName}
+            {category.emoji && <span className="mr-2">{category.emoji}</span>}
+            {category.display}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {STABILITY_INDICATORS.filter(ind => ind.category === categoryName).map((indicator) => {
-              const IconComponent = indicator.icon || BarChart3;
+            {STABILITY_INDICATORS.filter(ind => ind.categoryKey === category.key).map((indicator) => {
+              const IconComponent = indicator.icon || BarChartHorizontalBig;
               const isPlaceholder = !indicator.fredId;
 
-              if (isPlaceholder && categoryName !== 'Interest Rates Monitor') {
+              if (isPlaceholder) {
                 return (
                   <div
                     key={indicator.id}
@@ -119,7 +155,7 @@ const FinancialStabilityPage: React.FC = () => {
                       <IconComponent className="h-6 w-6 mr-3 text-muted-foreground" />
                       <h3 className="text-lg font-semibold text-muted-foreground">{indicator.name}</h3>
                     </div>
-                    <p className="text-sm text-muted-foreground">{indicator.description}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{indicator.description}</p>
                     <div className="mt-3 text-xs text-muted-foreground">
                       (Coming Soon)
                     </div>
@@ -127,29 +163,31 @@ const FinancialStabilityPage: React.FC = () => {
                 );
               }
               
-              if (indicator.fredId) {
-                return (
-                  <Link
-                    to={`/series/${indicator.fredId}`}
-                    key={indicator.id}
-                    className="block p-6 bg-card text-card-foreground rounded-lg shadow hover:shadow-md transition-shadow duration-200 ease-in-out group"
-                  >
-                    <div className="flex items-center mb-2">
-                      <IconComponent className="h-6 w-6 mr-3 text-primary group-hover:text-primary/80 transition-colors" />
-                      <h3 className="text-lg font-semibold text-primary group-hover:text-primary/80 transition-colors">{indicator.name}</h3>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{indicator.description}</p>
-                    <div className="mt-3 text-xs text-primary hover:underline group-hover:text-primary/80 transition-colors">
-                      View Details &rarr;
-                    </div>
-                  </Link>
-                );
-              }
-              return null;
+              // Render actual links for indicators with fredId
+              return (
+                <Link
+                  to={`/series/${indicator.fredId}`}
+                  key={indicator.id}
+                  className="block p-6 bg-card text-card-foreground rounded-lg shadow hover:shadow-md transition-shadow duration-200 ease-in-out group"
+                >
+                  <div className="flex items-center mb-2">
+                    <IconComponent className="h-6 w-6 mr-3 text-primary group-hover:text-primary/80 transition-colors" />
+                    <h3 className="text-lg font-semibold text-primary group-hover:text-primary/80 transition-colors">{indicator.name}</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{indicator.description}</p>
+                  <div className="mt-3 text-xs text-primary hover:underline group-hover:text-primary/80 transition-colors">
+                    View Details &rarr;
+                  </div>
+                </Link>
+              );
             })}
           </div>
-           {categoryName !== 'Interest Rates Monitor' && STABILITY_INDICATORS.filter(ind => ind.category === categoryName).length === 0 && (
-             <p className="text-sm text-muted-foreground">Indicators for this section will be added soon.</p>
+           {STABILITY_INDICATORS.filter(ind => ind.categoryKey === category.key && !ind.fredId).length === STABILITY_INDICATORS.filter(ind => ind.categoryKey === category.key).length && 
+            STABILITY_INDICATORS.filter(ind => ind.categoryKey === category.key).length > 0 && (
+             <p className="text-sm text-muted-foreground mt-4">Indicators for this section will be added soon.</p>
+           )}
+           {STABILITY_INDICATORS.filter(ind => ind.categoryKey === category.key).length === 0 && (
+             <p className="text-sm text-muted-foreground mt-4">This category is under development.</p>
            )}
         </section>
       ))}
