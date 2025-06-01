@@ -254,17 +254,7 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
     }
     
     return {
-      title: {
-        text: `${indexName} Historical Performance`,
-        left: 'left',
-        textStyle: {
-          fontSize: 16,
-          fontFamily: 'Inter, Helvetica Neue, Arial, sans-serif',
-          color: chartColors.foreground,
-          fontWeight: 400,
-        },
-        padding: [0, 0, 0, 10],
-      },
+      // title removed to eliminate chart title display
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'cross', label: { backgroundColor: '#6a7985' } },
@@ -295,7 +285,7 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
       series: baseOptionSeries,
       legend: {
         data: legendData,
-        bottom: 5,
+        top: 5,
         left: 'center',
         textStyle: { fontSize: 13, color: chartColors.mutedForeground },
         backgroundColor: 'transparent',

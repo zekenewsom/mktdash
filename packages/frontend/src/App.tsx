@@ -6,6 +6,7 @@ import EconomicPage from './pages/EconomicPage';
 import FinancialStabilityPage from './pages/FinancialStabilityPage';
 import IndicatorDetailPage from './pages/IndicatorDetailPage';
 import EconomicCalendarPage from './pages/EconomicCalendarPage';
+import AnalysisPage from './pages/AnalysisPage';
 
 function App() {
   // You might add context providers (e.g., for theme, data) here later
@@ -25,6 +26,7 @@ function App() {
           <Route path="/economic" element={<EconomicPage />} />
           <Route path="/calendar" element={<EconomicCalendarPage />} />
           <Route path="/stability" element={<FinancialStabilityPage />} />
+          <Route path="/analysis" element={<AnalysisPage />} />
         </Routes>
       </main>
     </div>
