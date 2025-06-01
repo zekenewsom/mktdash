@@ -1,6 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingDown, Factory, Briefcase, LineChart, DollarSign, Users } from 'lucide-react';
+import { 
+  TrendingDown, Factory, Briefcase, LineChart, DollarSign, Users, 
+  Activity, ShoppingCart, Smile, Brain
+} from 'lucide-react';
 
 interface EconomicIndicatorInfo {
   id: string;
@@ -62,20 +65,63 @@ const ECONOMIC_INDICATORS: EconomicIndicatorInfo[] = [
     icon: LineChart,
     fredId: 'ICSA',
   },
-  // --- Placeholders for other categories ---
+  // Category: Economic Growth
   {
-    id: 'placeholder-gdp',
-    name: 'GDP & Growth',
-    description: 'Gross Domestic Product and other growth indicators.',
+    id: 'gdp', name: 'Real Gross Domestic Product (GDP)',
+    description: 'The market value of all final goods and services produced within the U.S. in a given period, adjusted for inflation.',
     category: 'Economic Growth',
-    fredId: '',
+    icon: Activity,
+    fredId: 'GDPC1',
   },
   {
-    id: 'placeholder-sentiment',
-    name: 'Consumer & Business Sentiment',
-    description: 'Surveys measuring confidence and outlook.',
+    id: 'indpro', name: 'Industrial Production Index',
+    description: 'Measures the real output of all relevant establishments located in the United States, regardless of their ownership, but not those located in U.S. territories.',
+    category: 'Economic Growth',
+    icon: Factory,
+    fredId: 'INDPRO',
+  },
+  {
+    id: 'retail-sales', name: 'Advance Retail Sales',
+    description: 'Advance estimates of U.S. retail and food services sales, an indicator of consumer spending.',
+    category: 'Economic Growth',
+    icon: ShoppingCart,
+    fredId: 'RSXFS',
+  },
+  {
+    id: 'durable-goods', name: 'Durable Goods New Orders',
+    description: 'New orders for manufactured durable goods, a key indicator of future manufacturing activity.',
+    category: 'Economic Growth',
+    icon: Briefcase,
+    fredId: 'DGORDER',
+  },
+  // Category: Sentiment Indicators
+  {
+    id: 'consumer-sentiment', name: 'Consumer Sentiment (U. Michigan)',
+    description: 'University of Michigan\'s Index of Consumer Sentiment, measuring consumer confidence.',
     category: 'Sentiment Indicators',
-    fredId: '',
+    icon: Smile,
+    fredId: 'UMCSENT',
+  },
+  {
+    id: 'ism-mfg-pmi', name: 'ISM Manufacturing PMI',
+    description: 'The Institute for Supply Management (ISM) Manufacturing Purchasing Managers\' Index, a leading indicator of economic health.',
+    category: 'Sentiment Indicators',
+    icon: Factory,
+    fredId: 'NAPM',
+  },
+  {
+    id: 'ism-services-pmi', name: 'ISM Services PMI',
+    description: 'The Institute for Supply Management (ISM) Services Purchasing Managers\' Index (formerly Non-Manufacturing Index).',
+    category: 'Sentiment Indicators',
+    icon: Briefcase,
+    fredId: 'ISMNS',
+  },
+  {
+    id: 'philly-fed-mfg', name: 'Philadelphia Fed Mfg. Index',
+    description: 'Manufacturing Business Outlook Survey for general activity in the Philadelphia Fed region.',
+    category: 'Sentiment Indicators',
+    icon: Brain,
+    fredId: 'GACDFSA066MSFRBPHI',
   },
 ];
 

@@ -4,7 +4,10 @@ import MarketOverviewCard from '../components/placeholders/MarketOverviewCard';
 import TableContainer from '../components/placeholders/TableContainer';
 import NewsFeed from '../components/placeholders/NewsFeed';
 import ReportViewer from '../components/placeholders/ReportViewer';
-import { Briefcase, TrendingUp, BarChart3, Scale, ShieldAlert, Banknote } from 'lucide-react';
+import { 
+  Briefcase, TrendingUp, BarChart3, Scale, ShieldAlert, Banknote, 
+  Globe, DollarSign, Fuel, Gem, Leaf 
+} from 'lucide-react';
 
 interface MarketIndicatorInfo {
   id: string;
@@ -13,6 +16,52 @@ interface MarketIndicatorInfo {
   description: string;
   icon?: React.ElementType;
 }
+
+const CURRENCY_INDICATORS: MarketIndicatorInfo[] = [
+  {
+    id: 'dollar-index', fredId: 'DTWEXBGS', name: 'U.S. Dollar Index (Broad)',
+    description: 'Trade Weighted U.S. Dollar Index against a broad group of major U.S. trading partners.', icon: DollarSign,
+  },
+  {
+    id: 'eur-usd', fredId: 'DEXUSEU', name: 'EUR/USD Exchange Rate',
+    description: 'U.S. Dollars to One Euro exchange rate.', icon: Globe,
+  },
+  {
+    id: 'usd-jpy', fredId: 'DEXJPUS', name: 'USD/JPY Exchange Rate',
+    description: 'Japanese Yen to One U.S. Dollar exchange rate.', icon: Globe,
+  },
+  {
+    id: 'gbp-usd', fredId: 'DEXUSUK', name: 'GBP/USD Exchange Rate',
+    description: 'U.S. Dollars to One British Pound exchange rate.', icon: Globe,
+  },
+  {
+    id: 'usd-cny', fredId: 'DEXCHUS', name: 'USD/CNY Exchange Rate',
+    description: 'Chinese Yuan Renminbi to One U.S. Dollar exchange rate.', icon: Globe,
+  },
+];
+
+const COMMODITY_INDICATORS: MarketIndicatorInfo[] = [
+  {
+    id: 'wti-oil', fredId: 'DCOILWTICO', name: 'Crude Oil (WTI)',
+    description: 'West Texas Intermediate crude oil spot price in Cushing, OK.', icon: Fuel,
+  },
+  {
+    id: 'brent-oil', fredId: 'DCOILBRENTEU', name: 'Crude Oil (Brent)',
+    description: 'Brent crude oil spot price, a major global oil benchmark.', icon: Fuel,
+  },
+  {
+    id: 'gold', fredId: 'GOLDAMGBD228NLBM', name: 'Gold Price (London PM Fix)',
+    description: 'Gold fixing price per troy ounce in U.S. Dollars, London PM fix.', icon: Gem,
+  },
+  {
+    id: 'silver', fredId: 'SLVPRUSD', name: 'Silver Price (London Fix)',
+    description: 'Silver fixing price per troy ounce in U.S. Dollars, London fix.', icon: Gem,
+  },
+  {
+    id: 'natural-gas', fredId: 'DHHNGSP', name: 'Natural Gas (Henry Hub)',
+    description: 'Henry Hub Natural Gas spot price.', icon: Leaf,
+  },
+];
 
 const EQUITY_INDICES: MarketIndicatorInfo[] = [
   {
@@ -112,6 +161,22 @@ const MarketsPage: React.FC = () => {
       </div>
 
       <MarketOverviewCard />
+
+      {/* New Currencies (Forex) Section */}
+      <section className="pt-2">
+        <h2 className="text-2xl font-semibold tracking-tight mb-4 text-foreground">Currencies (Forex)</h2> {/* */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {CURRENCY_INDICATORS.map(renderIndicatorCard)}
+        </div>
+      </section>
+
+      {/* New Commodities Section */}
+      <section className="pt-2">
+        <h2 className="text-2xl font-semibold tracking-tight mb-4 text-foreground">Commodities</h2> {/* */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {COMMODITY_INDICATORS.map(renderIndicatorCard)}
+        </div>
+      </section>
 
       {/* U.S. Equity Indices Section */}
       <section className="pt-2">

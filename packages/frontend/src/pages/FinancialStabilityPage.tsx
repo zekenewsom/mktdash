@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, Landmark, Home, BarChartHorizontalBig, AlertTriangle, Car, Ban, Scale, ShieldCheck, Building } from 'lucide-react';
+import { TrendingUp, TrendingDown, Landmark, Home, BarChartHorizontalBig, AlertTriangle, Car, Ban, Scale, ShieldCheck, Building, LandPlot, Droplets, Filter, FileText, Banknote as MoneyIcon } from 'lucide-react';
 
 interface StabilityIndicatorInfo {
   id: string;
@@ -16,7 +16,7 @@ const STABILITY_CATEGORIES: { key: string; display: string; emoji?: string; }[] 
   { key: 'interestRates', display: 'Interest Rates Monitor', emoji: '🚨' },
   { key: 'defaultRates', display: 'Default & Delinquency Monitor', emoji: '📉' },
   { key: 'debtRatios', display: 'Debt Ratios Monitor', emoji: '⚖️' },
-  { key: 'assetValues', display: 'Asset Valuations (Stability)', emoji: '🏘️' },
+  { key: 'assetValues', display: 'Asset Valuations Monitor (Stability Lens)', emoji: '🏘️' },
   { key: 'liquidity', display: 'Liquidity Monitor', emoji: '💧' },
 ];
 
@@ -134,21 +134,88 @@ const STABILITY_INDICATORS: StabilityIndicatorInfo[] = [
     icon: Building, // Icon for corporate
     fredId: 'NCBDBILQ027S',
   },
+  // Category: Asset Valuations Monitor (Stability Lens)
   {
-    id: 'placeholder-asset-values',
-    name: 'Asset Value Trends (Stability)',
-    description: 'Monitoring stock market, housing, and commercial real estate for sharp declines.',
+    id: 'sp500-stability',
+    name: 'S&P 500 (Valuation)',
+    description: 'Broad U.S. equity market performance, monitored for sharp declines or overvaluation.',
     categoryKey: 'assetValues',
-    categoryDisplay: 'Asset Valuations (Stability)',
-    fredId: '',
+    categoryDisplay: 'Asset Valuations Monitor (Stability Lens)',
+    icon: TrendingDown,
+    fredId: 'SP500',
   },
   {
-    id: 'placeholder-liquidity',
-    name: 'Market Liquidity Monitor',
-    description: 'Indicators of stress in short-term funding markets and banking system liquidity.',
+    id: 'nasdaq-stability',
+    name: 'NASDAQ Composite (Valuation)',
+    description: 'Tech-heavy equity index, monitored for volatility and valuation concerns.',
+    categoryKey: 'assetValues',
+    categoryDisplay: 'Asset Valuations Monitor (Stability Lens)',
+    icon: TrendingUp,
+    fredId: 'NASDAQCOM',
+  },
+  {
+    id: 'case-shiller-hpi',
+    name: 'S&P/Case-Shiller Home Price Index',
+    description: 'Tracks U.S. residential real estate prices, an indicator of housing market stability.',
+    categoryKey: 'assetValues',
+    categoryDisplay: 'Asset Valuations Monitor (Stability Lens)',
+    icon: Home,
+    fredId: 'CSUSHPINSA',
+  },
+  {
+    id: 'fhfa-hpi',
+    name: 'FHFA House Price Index',
+    description: 'Measures average price changes in repeat sales or refinancing on the same properties.',
+    categoryKey: 'assetValues',
+    categoryDisplay: 'Asset Valuations Monitor (Stability Lens)',
+    icon: LandPlot,
+    fredId: 'USSTHPI',
+  },
+  {
+    id: 'reit-index-stability',
+    name: 'Wilshire US REIT Index',
+    description: 'Tracks performance of U.S. publicly traded Real Estate Investment Trusts (REITs), a proxy for commercial real estate trends.',
+    categoryKey: 'assetValues',
+    categoryDisplay: 'Asset Valuations Monitor (Stability Lens)',
+    icon: Building,
+    fredId: 'WILLREITIND',
+  },
+  // Category: Liquidity Monitor
+  {
+    id: 'sofr',
+    name: 'Secured Overnight Financing Rate (SOFR)',
+    description: 'A broad measure of the cost of borrowing cash overnight collateralized by Treasury securities.',
     categoryKey: 'liquidity',
     categoryDisplay: 'Liquidity Monitor',
-    fredId: '',
+    icon: Droplets,
+    fredId: 'SOFR',
+  },
+  {
+    id: 'cp-tbill-spread',
+    name: '3M AA Fin. Commercial Paper - 3M T-Bill Spread',
+    description: 'Difference between 3-Month AA Financial Commercial Paper and 3-Month Treasury Bill rates. Indicates short-term credit risk and liquidity.',
+    categoryKey: 'liquidity',
+    categoryDisplay: 'Liquidity Monitor',
+    icon: Filter,
+    fredId: 'CPF3MTB3M',
+  },
+  {
+    id: 'm2-money-stock',
+    name: 'M2 Money Stock',
+    description: 'A broad measure of money supply including cash, checking deposits, savings deposits, money market securities, etc.',
+    categoryKey: 'liquidity',
+    categoryDisplay: 'Liquidity Monitor',
+    icon: MoneyIcon,
+    fredId: 'M2SL',
+  },
+  {
+    id: 'sloos-ci-loans',
+    name: 'Bank Lending Standards (C&I Loans)',
+    description: 'Net percentage of domestic banks tightening standards for commercial and industrial loans to large and middle-market firms.',
+    categoryKey: 'liquidity',
+    categoryDisplay: 'Liquidity Monitor',
+    icon: FileText,
+    fredId: 'DRTSCILM',
   },
 ];
 
