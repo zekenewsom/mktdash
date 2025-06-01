@@ -78,6 +78,44 @@ export function getPastDates(currentDate: Date) {
 }
 
 /**
+ * Calculates Simple Moving Average (SMA) for a given period from the end of the data.
+ * @param data Sorted array of DataPoints (ascending by date).
+ * @param period The number of data points to include in the SMA.
+ * @returns The SMA value or null if not enough data.
+ */
+export function calculateSMA(data: DataPoint[], period: number): number | null {
+  if (!data || data.length < period) {
+    return null;
+  }
+  const relevantData = data.slice(data.length - period);
+  const sum = relevantData.reduce((acc, point) => acc + point.value, 0);
+  return parseFloat((sum / period).toFixed(4));
+}
+
+/**
+ * Filters data points within the last N days from a reference end date.
+ * @param historicalData Sorted array of DataPoints (ascending by date).
+ * @param endDate The reference end date.
+ * @param days The number of days to look back.
+ * @returns Filtered array of DataPoints.
+ */
+export function getDataForLastNDays(
+  historicalData: DataPoint[],
+  endDate: Date,
+  days: number
+): DataPoint[] {
+  const startDate = new Date(endDate);
+  startDate.setDate(endDate.getDate() - days);
+  startDate.setUTCHours(0,0,0,0);
+
+  return historicalData.filter(point => {
+    const pointDate = new Date(point.date);
+    pointDate.setUTCHours(0,0,0,0);
+    return pointDate >= startDate && pointDate <= endDate;
+  });
+}
+
+/**
  * Calculates performance metrics (absolute and percentage change).
  * @param currentValue The current value.
  * @param pastValue The past value.

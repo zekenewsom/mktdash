@@ -4,14 +4,27 @@ import axios from 'axios';
 import IndexChart from '../components/IndexChart';
 import IndicatorHeader from '../components/Indicator/IndicatorHeader';
 import IndicatorMetricsTable from '../components/Indicator/IndicatorMetricsTable';
+import IndicatorAnalyticsPanel from '../components/Indicator/IndicatorAnalyticsPanel';
 import { Button } from "../components/ui/button";
 import { ArrowLeft } from 'lucide-react';
+
+interface DataPointValue {
+  date: string;
+  value: number;
+}
+interface AnalyticalMetricsData {
+  sma50?: number | null;
+  sma200?: number | null;
+  yearlyHigh?: DataPointValue | null;
+  yearlyLow?: DataPointValue | null;
+}
 
 interface SeriesData {
   seriesInfo?: any;
   currentValue?: { date: string; value: number };
   historical?: { date: string; value: number }[];
   metrics?: any;
+  analyticalMetrics?: AnalyticalMetricsData;
 }
 
 const IndicatorDetailPage: React.FC = () => {
@@ -89,9 +102,12 @@ const IndicatorDetailPage: React.FC = () => {
             error={null}
         />
       </div>
-      <IndicatorMetricsTable metrics={seriesData.metrics} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <IndicatorMetricsTable metrics={seriesData.metrics} />
+        <IndicatorAnalyticsPanel metrics={seriesData.analyticalMetrics} />
+      </div>
       {seriesData.seriesInfo?.notes && (
-        <div className="p-4 bg-card text-card-foreground rounded-lg shadow">
+        <div className="p-4 bg-card text-card-foreground rounded-lg shadow mt-6">
           <h3 className="text-lg font-semibold mb-2 text-primary">Notes</h3>
           <div className="text-sm prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: seriesData.seriesInfo.notes }} />
         </div>

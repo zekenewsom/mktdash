@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { DataPoint, findDataPointOnOrBefore, getPastDates, calculatePerformance } from '../utils/dateUtils';
+import { DataPoint, findDataPointOnOrBefore, getPastDates, calculatePerformance, calculateSMA, getDataForLastNDays } from '../utils/dateUtils';
 
 const FRED_API_KEY = process.env.FRED_API_KEY;
 const FRED_BASE_URL = 'https://api.stlouisfed.org/fred/series/observations';
@@ -167,9 +167,31 @@ export async function getSeriesDetails(seriesId: string) {
     // For now, return all historical data fetched. Can add duration filter later.
     const chartData = historicalData; // Can be further processed/filtered if needed
 
+    // --- NEW: Analytical Metrics Calculation ---
+    const analyticalMetrics: Record<string, any> = {};
+    // Moving Averages
+    analyticalMetrics['sma50'] = calculateSMA(historicalData, 50);
+    analyticalMetrics['sma200'] = calculateSMA(historicalData, 200);
+    // 52-Week High/Low (approx 365 days)
+    const lastYearData = getDataForLastNDays(historicalData, currentDate, 365);
+    if (lastYearData.length > 0) {
+      let yearlyHigh: DataPoint = lastYearData[0];
+      let yearlyLow: DataPoint = lastYearData[0];
+      for (const point of lastYearData) {
+        if (point.value > yearlyHigh.value) yearlyHigh = point;
+        if (point.value < yearlyLow.value) yearlyLow = point;
+      }
+      analyticalMetrics['yearlyHigh'] = yearlyHigh;
+      analyticalMetrics['yearlyLow'] = yearlyLow;
+    } else {
+      analyticalMetrics['yearlyHigh'] = null;
+      analyticalMetrics['yearlyLow'] = null;
+    }
+    // --- End of Analytical Metrics ---
+
     return {
       data: {
-        seriesInfo: { // Add basic info from FRED series endpoint
+        seriesInfo: {
             id: seriesInfo.id,
             title: seriesInfo.title,
             units_short: seriesInfo.units_short,
@@ -181,8 +203,9 @@ export async function getSeriesDetails(seriesId: string) {
         currentValue: latestDataPoint,
         historical: chartData,
         metrics,
+        analyticalMetrics, // NEW: Added analytical metrics
       },
-      error: historyResult.error, // Propagate error from fetching if cache was used
+      error: historyResult.error,
     };
 
   } catch (err: any) {
