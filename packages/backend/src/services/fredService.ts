@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { fetchWithRetry } from '../utils/fetchWithRetry';
 
 const FRED_API_KEY = process.env.FRED_API_KEY;
 console.log('Loaded FRED API KEY:', FRED_API_KEY);
@@ -23,7 +24,7 @@ export async function fetchMacroData(seriesIds: string[]) {
       const url = `${FRED_BASE_URL}?series_id=${id}&api_key=${FRED_API_KEY}&file_type=json&observation_end=${today}`;
       console.log('FRED URL:', url); // Debug URL
       try {
-        const resp = await axios.get(url);
+        const resp = await fetchWithRetry(url);
         const obsArr = resp.data.observations || [];
         const obs = obsArr.length > 0 ? obsArr[obsArr.length - 1] : undefined;
         // Handle FRED missing value '.'

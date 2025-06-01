@@ -56,7 +56,27 @@ export const getSeriesHistory = async (req: Request, res: Response) => {
 };
 
 // Placeholder controller for fetching market index performance
-import { fetchIndexPerformance, fetchIndexHistory, fetchFredSeriesHistory } from '../services/marketDataService';
+import { fetchIndexPerformance, fetchIndexHistory, fetchFredSeriesHistory, getSeriesDetails } from '../services/marketDataService';
+
+// --- NEW CONTROLLER FUNCTION ---
+export const getSingleSeriesDetails = async (req: Request, res: Response) => {
+  const { seriesId } = req.params;
+  if (!seriesId || typeof seriesId !== 'string') {
+    return res.status(400).json({ error: 'Missing or invalid seriesId path parameter' });
+  }
+
+  try {
+    const result = await getSeriesDetails(seriesId);
+    if (result.error && !result.data) { // If there's an error and absolutely no data
+      return res.status(500).json({ error: result.error, data: null });
+    }
+    // If data is null but no error, or data is present, send it
+    return res.status(200).json(result); // result is { data: { ... }, error: ... }
+  } catch (err: any) {
+    console.error(`Controller error for getSingleSeriesDetails ${seriesId}:`, err);
+    return res.status(500).json({ error: err.message || 'Unknown server error', data: null });
+  }
+};
 
 export const getMarketIndices = async (req: Request, res: Response) => {
   // Fetch market indices from FRED (value, date)

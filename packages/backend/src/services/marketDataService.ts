@@ -1,4 +1,7 @@
 import axios from 'axios';
+import { fetchWithRetry } from '../utils/fetchWithRetry';
+import { connectRedis, getCache, setCache } from '../utils/redis';
+import { DataPoint, findDataPointOnOrBefore, getPastDates, calculatePerformance, calculateSMA, calculateHistoricalSMA, getDataForLastNDays } from '../utils/dateUtils';
 
 const FRED_API_KEY = process.env.FRED_API_KEY;
 const FRED_BASE_URL = 'https://api.stlouisfed.org/fred/series/observations';
@@ -21,7 +24,7 @@ async function fetchFredIndex(seriesId: string) {
   const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
   const url = `${FRED_BASE_URL}?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json&observation_end=${today}`;
   try {
-    const resp = await axios.get(url);
+    const resp = await fetchWithRetry(url);
     const obsArr = resp.data.observations || [];
     const obs = obsArr.length > 0 ? obsArr[obsArr.length - 1] : undefined;
     if (obs && obs.value !== '.') {
@@ -34,7 +37,7 @@ async function fetchFredIndex(seriesId: string) {
   }
 }
 
-const indexHistoryCache: Record<string, { data: any[]; lastFetched: number }> = {};
+const indexHistoryCache: Record<string, { data: any[]; lastFetched: number; seriesInfo?: any }> = {};
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 export async function fetchIndexPerformance() {
@@ -46,7 +49,7 @@ export async function fetchIndexPerformance() {
       const today = new Date().toISOString().slice(0, 10);
       const url = `${FRED_BASE_URL}?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json&observation_end=${today}`;
       try {
-        const resp = await axios.get(url);
+        const resp = await fetchWithRetry(url);
         const obsArr = resp.data.observations || [];
         const n = obsArr.length;
         if (n > 1) {
@@ -79,29 +82,158 @@ export async function fetchIndexPerformance() {
 }
 
 // Fetch historical data for any FRED series with in-memory caching
-export async function fetchFredSeriesHistory(seriesId: string) {
+export async function fetchFredSeriesHistory(seriesId: string, forceRefresh: boolean = false): Promise<{ data: DataPoint[]; error: string | null; cached: boolean; seriesInfo?: any }> {
+  await connectRedis();
+  const cacheKey = `fred:series:${seriesId}`;
+  if (!forceRefresh) {
+    const cached = await getCache(cacheKey);
+    if (cached) {
+      console.log(`[Redis] FRED cache hit for ${cacheKey}`);
+      return { ...cached, cached: true };
+    } else {
+      console.log(`[Redis] FRED cache miss for ${cacheKey}`);
+    }
+  }
   const now = Date.now();
   if (
+    !forceRefresh &&
     indexHistoryCache[seriesId] &&
     now - indexHistoryCache[seriesId].lastFetched < CACHE_TTL_MS
   ) {
-    return { data: indexHistoryCache[seriesId].data, error: null, cached: true };
+    return { data: indexHistoryCache[seriesId].data, error: null, cached: true, seriesInfo: indexHistoryCache[seriesId].seriesInfo };
   }
-  const url = `${FRED_BASE_URL}?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json`;
-  console.log('FRED URL:', url); // Debug log
+
+  const seriesUrl = `https://api.stlouisfed.org/fred/series?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json`;
+  const observationsUrl = `${FRED_BASE_URL}?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json&sort_order=asc`;
+
   try {
-    const resp = await axios.get(url);
-    const obsArr = resp.data.observations || [];
-    const data = obsArr
+    const [seriesInfoRes, observationsRes] = await Promise.all([
+        fetchWithRetry(seriesUrl),
+        fetchWithRetry(observationsUrl)
+    ]);
+    
+    const seriesInfo = seriesInfoRes.data.seriess && seriesInfoRes.data.seriess.length > 0 ? seriesInfoRes.data.seriess[0] : {};
+
+    const obsArr = observationsRes.data.observations || [];
+    const historicalData: DataPoint[] = obsArr
       .filter((obs: any) => obs.value !== '.')
       .map((obs: any) => ({ date: obs.date, value: parseFloat(obs.value) }));
-    indexHistoryCache[seriesId] = { data, lastFetched: now };
-    return { data, error: null, cached: false };
+
+    indexHistoryCache[seriesId] = { data: historicalData, lastFetched: now, seriesInfo };
+    // Use configurable TTL from env or default to 86400s (24h)
+    const historyTtl = Number(process.env.FRED_HISTORY_CACHE_TTL) || 86400;
+    await setCache(cacheKey, { data: historicalData, seriesInfo }, historyTtl); // Cache for historyTtl seconds
+    return { data: historicalData, error: null, cached: false, seriesInfo };
   } catch (err: any) {
-    console.error('FRED fetch error for', seriesId, ':', err);
+    console.error('FRED fetch error for series history', seriesId, ':', err.message);
+    if (indexHistoryCache[seriesId]) {
+        console.warn(`Returning stale cache for ${seriesId} due to fetch error.`);
+        return { ...indexHistoryCache[seriesId], error: err.message || 'API error, using stale cache', cached: true};
+    }
     return { data: [], error: err.message || 'API error', cached: false };
   }
 }
+
+// --- NEW FUNCTION: getSeriesDetails ---
+export async function getSeriesDetails(seriesId: string) {
+  try {
+    const historyResult = await fetchFredSeriesHistory(seriesId);
+    if (historyResult.error && historyResult.data.length === 0) { // If error and no cached data
+      return { data: null, error: `Failed to fetch data for ${seriesId}: ${historyResult.error}` };
+    }
+
+    const historicalData = historyResult.data;
+    const seriesInfo = historyResult.seriesInfo || {};
+
+    if (historicalData.length === 0) {
+      return { data: { seriesInfo, historical: [], metrics: {}, currentValue: null }, error: 'No historical data available.' };
+    }
+
+    const latestDataPoint = historicalData[historicalData.length - 1];
+    const currentDate = new Date(latestDataPoint.date); // Use date of latest data point as current
+    currentDate.setUTCHours(0,0,0,0); // Normalize to start of day UTC
+
+    const datesForMetrics = getPastDates(currentDate);
+
+    const metrics: Record<string, any> = {};
+    const periods: Record<string, Date> = {
+      '1D': datesForMetrics.oneDayAgo,
+      '1W': datesForMetrics.oneWeekAgo,
+      '1M': datesForMetrics.oneMonthAgo,
+      '3M': datesForMetrics.threeMonthsAgo,
+      '6M': datesForMetrics.sixMonthsAgo,
+      '1Y': datesForMetrics.oneYearAgo,
+    };
+
+    for (const periodKey in periods) {
+      const pastDataPoint = findDataPointOnOrBefore(historicalData, periods[periodKey]);
+      metrics[periodKey] = calculatePerformance(latestDataPoint.value, pastDataPoint?.value);
+      metrics[periodKey].pastDate = pastDataPoint?.date || null;
+      metrics[periodKey].pastValue = pastDataPoint?.value || null;
+    }
+    
+    // YTD Calculation
+    const ytdStartDate = datesForMetrics.lastDayOfPrevYear; // Value at end of last year
+    const ytdStartPoint = findDataPointOnOrBefore(historicalData, ytdStartDate);
+    metrics['YTD'] = calculatePerformance(latestDataPoint.value, ytdStartPoint?.value);
+    metrics['YTD'].pastDate = ytdStartPoint?.date || null;
+    metrics['YTD'].pastValue = ytdStartPoint?.value || null;
+
+    // Filter historical data for chart (e.g., last 5 years, or all)
+    // For now, return all historical data fetched. Can add duration filter later.
+    const chartData = historicalData; // Can be further processed/filtered if needed
+
+    // --- NEW: Analytical Metrics Calculation ---
+    const analyticalMetrics: Record<string, any> = {};
+    // Moving Averages (latest values for panel)
+    analyticalMetrics['latestSma50'] = calculateSMA(historicalData, 50);
+    analyticalMetrics['latestSma200'] = calculateSMA(historicalData, 200);
+    // Moving Averages (historical series for chart)
+    analyticalMetrics['historicalSma50'] = calculateHistoricalSMA(historicalData, 50);
+    analyticalMetrics['historicalSma200'] = calculateHistoricalSMA(historicalData, 200);
+    // 52-Week High/Low (approx 365 days)
+    const lastYearData = getDataForLastNDays(historicalData, currentDate, 365);
+    if (lastYearData.length > 0) {
+      let yearlyHigh: DataPoint = lastYearData[0];
+      let yearlyLow: DataPoint = lastYearData[0];
+      for (const point of lastYearData) {
+        if (point.value > yearlyHigh.value) yearlyHigh = point;
+        if (point.value < yearlyLow.value) yearlyLow = point;
+      }
+      analyticalMetrics['yearlyHigh'] = yearlyHigh;
+      analyticalMetrics['yearlyLow'] = yearlyLow;
+    } else {
+      analyticalMetrics['yearlyHigh'] = null;
+      analyticalMetrics['yearlyLow'] = null;
+    }
+    // --- End of Analytical Metrics ---
+
+    const result = {
+      data: {
+        seriesInfo: {
+            id: seriesInfo.id,
+            title: seriesInfo.title,
+            units_short: seriesInfo.units_short,
+            seasonal_adjustment_short: seriesInfo.seasonal_adjustment_short,
+            frequency_short: seriesInfo.frequency_short,
+            notes: seriesInfo.notes, // Might be too long for overview
+            last_updated: seriesInfo.last_updated,
+        },
+        currentValue: latestDataPoint,
+        historical: chartData,
+        metrics,
+        analyticalMetrics, // NEW: Added analytical metrics
+      },
+      error: historyResult.error,
+    };
+    return result;
+
+  } catch (err: any) {
+    console.error(`Error in getSeriesDetails for ${seriesId}:`, err);
+    return { data: null, error: err.message || `Unknown error fetching details for ${seriesId}` };
+  }
+}
+
 
 // Historical index data (for backwards compatibility)
 export async function fetchIndexHistory(seriesId: string) {
