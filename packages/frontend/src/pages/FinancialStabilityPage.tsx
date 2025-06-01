@@ -12,12 +12,12 @@ interface StabilityIndicatorInfo {
   fredId?: string;
 }
 
-const STABILITY_CATEGORIES: { key: string; display: string; emoji?: string; }[] = [
-  { key: 'interestRates', display: 'Interest Rates Monitor', emoji: '🚨' },
-  { key: 'defaultRates', display: 'Default & Delinquency Monitor', emoji: '📉' },
-  { key: 'debtRatios', display: 'Debt Ratios Monitor', emoji: '⚖️' },
-  { key: 'assetValues', display: 'Asset Valuations Monitor (Stability Lens)', emoji: '🏘️' },
-  { key: 'liquidity', display: 'Liquidity Monitor', emoji: '💧' },
+const STABILITY_CATEGORIES: { key: string; display: string; }[] = [
+  { key: 'interestRates', display: 'Interest Rates Monitor'},
+  { key: 'defaultRates', display: 'Default & Delinquency Monitor' },
+  { key: 'debtRatios', display: 'Debt Ratios Monitor' },
+  { key: 'assetValues', display: 'Asset Valuations Monitor (Stability Lens)' },
+  { key: 'liquidity', display: 'Liquidity Monitor' },
 ];
 
 const STABILITY_INDICATORS: StabilityIndicatorInfo[] = [
@@ -232,7 +232,6 @@ const FinancialStabilityPage: React.FC = () => {
       {STABILITY_CATEGORIES.map((category) => (
         <section key={category.key} className="pt-2">
           <h2 className="text-2xl font-semibold tracking-tight mb-4 pb-2 border-b border-border text-foreground">
-            {category.emoji && <span className="mr-2">{category.emoji}</span>}
             {category.display}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
