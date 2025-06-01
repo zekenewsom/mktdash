@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getMacroData, getMarketIndices, getIndexHistory, getSeriesHistory } from '../controllers/dataController';
+import { getMacroData, getMarketIndices, getIndexHistory, getSeriesHistory, getSingleSeriesDetails } from '../controllers/dataController';
 import { generateDailyReport } from '../controllers/reportController';
 
 const router = Router();
@@ -11,6 +11,9 @@ router.get('/macro', getMacroData);
 router.get('/market-indices', getMarketIndices);
 router.get('/market-indices/history', getIndexHistory);
 router.get('/history', getSeriesHistory);
+
+// New: Detailed FRED series endpoint
+router.get('/series/:seriesId', getSingleSeriesDetails);
 
 // Placeholder route to trigger daily report generation (can be called manually for testing)
 router.post('/report/generate', generateDailyReport);
