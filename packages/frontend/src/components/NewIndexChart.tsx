@@ -2,7 +2,7 @@ import React, { useMemo, useEffect, useState, useRef } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { graphic } from 'echarts/core';
 import { Button } from './ui/button';
-import { LineChart as LineChartIcon, Trash2, Hand } from 'lucide-react';
+import { LineChart as LineChartIcon, Trash2, Hand, Ruler } from 'lucide-react';
 
 interface DataPoint {
   date: string;
@@ -30,9 +30,19 @@ interface ChartThemeColors {
   sma50Color?: string;
   sma200Color?: string;
   drawingLineColor?: string;
+  measurementLineColor?: string;
+  measurementFillColor?: string;
 }
 
-type DrawingTool = 'none' | 'trendline';
+interface Measurement {
+  start: DataPoint;
+  end: DataPoint;
+  change: number;
+  percentChange: number;
+}
+
+
+type InteractionTool = 'none' | 'trendline' | 'measure';
 interface DrawnLine {
   id: string;
   type: 'trendline';
@@ -53,10 +63,10 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
   const echartsRef = useRef<any>(null);
 
   // Drawing State
-  const [activeTool, setActiveTool] = useState<DrawingTool>('none');
-  const [tempLinePoints, setTempLinePoints] = useState<DataPoint[]>([]);
+  const [activeTool, setActiveTool] = useState<InteractionTool>('none');
+  const [tempInteractionPoints, setTempInteractionPoints] = useState<DataPoint[]>([]);
   const [drawnLines, setDrawnLines] = useState<DrawnLine[]>([]);
-  const [mouseMoveParams, setMouseMoveParams] = useState<any>(null);
+  const [measurement, setMeasurement] = useState<Measurement | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -82,6 +92,8 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
       const sma50Color = rootStyle.getPropertyValue('--chart-2').trim() ? `hsl(${rootStyle.getPropertyValue('--chart-2').trim().split(' ').join(', ')})` : 'orange';
       const sma200Color = rootStyle.getPropertyValue('--chart-3').trim() ? `hsl(${rootStyle.getPropertyValue('--chart-3').trim().split(' ').join(', ')})` : 'purple';
       const drawingLineColor = rootStyle.getPropertyValue('--chart-4').trim() ? `hsl(${rootStyle.getPropertyValue('--chart-4').trim().split(' ').join(', ')})` : '#FF6347';
+      const measurementLineColor = rootStyle.getPropertyValue('--chart-5').trim() ? `hsl(${rootStyle.getPropertyValue('--chart-5').trim().split(' ').join(', ')})` : '#4682B4'; // SteelBlue
+      const measurementFillColor = `hsla(${primaryParsed.h}, ${primaryParsed.s}%, ${primaryParsed.l}%, 0.1)`;
       setChartColors({
         primary: primaryParsed.string,
         primaryRgb: { h: primaryParsed.h, s: primaryParsed.s, l: primaryParsed.l },
@@ -94,6 +106,8 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
         sma50Color: sma50Color,
         sma200Color: sma200Color,
         drawingLineColor: drawingLineColor,
+        measurementLineColor,
+        measurementFillColor,
       });
     }
   }, []);
@@ -110,11 +124,12 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
     if (xIndex < 0 || xIndex >= dates.length) return;
     const clickedDate = dates[xIndex];
     const clickedValue = dataCoord[1];
-    const currentDataPoint: DataPoint = { date: clickedDate, value: parseFloat(clickedValue.toFixed(2)) };
+    const currentDataPoint: DataPoint = { date: clickedDate, value: parseFloat(clickedValue.toFixed(4)) };
+
     if (activeTool === 'trendline') {
-      const newTempPoints = [...tempLinePoints, currentDataPoint];
+      const newTempPoints = [...tempInteractionPoints, currentDataPoint];
       if (newTempPoints.length === 1) {
-        setTempLinePoints(newTempPoints);
+        setTempInteractionPoints(newTempPoints);
       } else if (newTempPoints.length === 2) {
         setDrawnLines((prevLines) => [
           ...prevLines,
@@ -126,14 +141,33 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
             color: chartColors.drawingLineColor || 'red',
           },
         ]);
-        setTempLinePoints([]);
+        setTempInteractionPoints([]);
+      }
+    } else if (activeTool === 'measure') {
+      const newTempPoints = [...tempInteractionPoints, currentDataPoint];
+      if (newTempPoints.length === 1) {
+        setTempInteractionPoints(newTempPoints);
+        setMeasurement(null);
+      } else if (newTempPoints.length === 2) {
+        const startPt = newTempPoints[0];
+        const endPt = newTempPoints[1];
+        const change = endPt.value - startPt.value;
+        const percentChange = startPt.value !== 0 ? (change / startPt.value) * 100 : (change > 0 ? Infinity : (change < 0 ? -Infinity : 0) );
+        setMeasurement({
+          start: startPt,
+          end: endPt,
+          change: parseFloat(change.toFixed(2)),
+          percentChange: parseFloat(percentChange.toFixed(2)),
+        });
+        setTempInteractionPoints([]);
       }
     }
   };
 
-  const clearDrawing = () => {
+  const clearInteractions = () => {
     setDrawnLines([]);
-    setTempLinePoints([]);
+    setTempInteractionPoints([]);
+    setMeasurement(null);
     setActiveTool('none');
   };
 
@@ -145,15 +179,14 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
       };
     }
     const dates = data.map(d => d.date);
-    const values = data.map(d => d.value);
-    const seriesConfig: any[] = [
+    let baseOptionSeries: any[] = [
       {
         name: indexName,
         type: 'line',
         smooth: true,
         showSymbol: false,
         sampling: 'lttb',
-        data: values,
+        data: data.map(d => d.value),
         lineStyle: { width: 2.5, color: chartColors.primary },
         areaStyle: {
           color: new graphic.LinearGradient(0, 0, 0, 1, [
@@ -171,7 +204,7 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
     const legendData = [indexName];
     if (sma50Data && sma50Data.length > 0) {
       legendData.push('SMA 50');
-      seriesConfig.push({
+      baseOptionSeries.push({
         name: 'SMA 50',
         type: 'line',
         smooth: true,
@@ -183,7 +216,7 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
     }
     if (sma200Data && sma200Data.length > 0) {
       legendData.push('SMA 200');
-      seriesConfig.push({
+      baseOptionSeries.push({
         name: 'SMA 200',
         type: 'line',
         smooth: true,
@@ -193,9 +226,10 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
         emphasis: { focus: 'series', lineStyle: { width: 2 } },
       });
     }
-    // Drawn lines custom series
+
+    // Add custom series for drawn trend lines
     if (drawnLines.length > 0) {
-      seriesConfig.push({
+      baseOptionSeries.push({
         type: 'custom',
         name: 'User Drawings',
         renderItem: (params: any, api: any) => {
@@ -209,14 +243,8 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
           if (!startPx || !endPx) return;
           return {
             type: 'line',
-            shape: {
-              x1: startPx[0], y1: startPx[1],
-              x2: endPx[0], y2: endPx[1],
-            },
-            style: {
-              stroke: currentLine.color || chartColors.drawingLineColor || 'red',
-              lineWidth: 2,
-            },
+            shape: { x1: startPx[0], y1: startPx[1], x2: endPx[0], y2: endPx[1] },
+            style: { stroke: currentLine.color, lineWidth: 2 },
             z: 100,
           };
         },
@@ -224,31 +252,7 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
         clip: true,
       });
     }
-    // Drawing preview
-    if (activeTool === 'trendline' && tempLinePoints.length === 1 && mouseMoveParams && chartColors) {
-      const echartsInstance = echartsRef.current?.getEchartsInstance();
-      if (echartsInstance) {
-        const startDataPoint = tempLinePoints[0];
-        const startXIndex = dates.indexOf(startDataPoint.date);
-        if (startXIndex !== -1) {
-          const startPx = echartsInstance.convertToPixel({ gridIndex: 0 }, [startXIndex, startDataPoint.value]);
-          const currentMousePx = [mouseMoveParams.offsetX, mouseMoveParams.offsetY];
-          if (startPx) {
-            seriesConfig.push({
-              type: 'custom',
-              name: 'Drawing Preview',
-              renderItem: () => ({
-                type: 'line',
-                shape: { x1: startPx[0], y1: startPx[1], x2: currentMousePx[0], y2: currentMousePx[1] },
-                style: { stroke: chartColors.drawingLineColor || 'rgba(255,0,0,0.5)', lineWidth: 1, lineDash: [3, 3] },
-                z: 99,
-              }),
-              data: [{ value: 1 }],
-            });
-          }
-        }
-      }
-    }
+    
     return {
       title: {
         text: `${indexName} Historical Performance`,
@@ -288,7 +292,7 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
         splitLine: { show: true, lineStyle: { color: [chartColors.primaryGradientStart] } },
         axisLine: { show: false },
       },
-      series: seriesConfig,
+      series: baseOptionSeries,
       legend: {
         data: legendData,
         bottom: 5,
@@ -329,16 +333,7 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
       animationDuration: 400,
       animationEasing: 'cubicInOut',
     };
-  }, [data, indexName, chartColors, sma50Data, sma200Data, drawnLines, activeTool, tempLinePoints, mouseMoveParams]);
-
-  const onEvents = {
-    click: handleChartClick,
-    mousemove: (params: any) => {
-      if (activeTool === 'trendline' && tempLinePoints.length === 1) {
-        setMouseMoveParams(params);
-      }
-    },
-  };
+  }, [data, indexName, chartColors, sma50Data, sma200Data, drawnLines, activeTool, tempInteractionPoints, measurement]);
 
   if (loading) {
     return <div className="flex items-center justify-center h-full text-muted-foreground">Loading chart...</div>;
@@ -354,17 +349,18 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
   }
 
   return (
-    <div>
+    <div className="relative"> {/* Added relative for overlay positioning */}
       {/* Toolbar for drawing tools */}
-      <div className="mb-2 flex space-x-2 p-2 bg-card rounded shadow-sm border border-border">
+      <div className="mb-2 flex space-x-2 p-2 bg-card rounded shadow-sm border border-border items-center">
         <Button
           variant={activeTool === 'none' ? 'secondary' : 'outline'}
           size="sm"
           onClick={() => {
             setActiveTool('none');
-            setTempLinePoints([]);
+            setTempInteractionPoints([]);
+            setMeasurement(null);
           }}
-          title="Default cursor"
+          title="Default cursor (Pan)"
         >
           <Hand className="h-4 w-4" />
         </Button>
@@ -373,25 +369,48 @@ const NewIndexChart: React.FC<NewIndexChartProps> = ({
           size="sm"
           onClick={() => {
             setActiveTool('trendline');
-            setTempLinePoints([]);
+            setTempInteractionPoints([]);
+            setMeasurement(null);
           }}
           title="Draw Trend Line"
         >
           <LineChartIcon className="h-4 w-4" />
         </Button>
-        {drawnLines.length > 0 && (
-          <Button variant="destructive" size="sm" onClick={clearDrawing} title="Clear Drawings">
-            <Trash2 className="h-4 w-4 mr-1" /> Clear All
+        <Button
+          variant={activeTool === 'measure' ? 'secondary' : 'outline'}
+          size="sm"
+          onClick={() => {
+            setActiveTool('measure');
+            setTempInteractionPoints([]);
+            setMeasurement(null);
+          }}
+          title="Measure Change"
+        >
+          <Ruler className="h-4 w-4" />
+        </Button>
+        {(drawnLines.length > 0 || measurement || tempInteractionPoints.length > 0) && (
+          <Button variant="destructive" size="sm" onClick={clearInteractions} title="Clear Drawings & Measurement">
+            <Trash2 className="h-4 w-4 mr-1" /> Clear
           </Button>
         )}
       </div>
+      {/* Display Measurement Result */}
+      {measurement && chartColors && (
+        <div className="absolute top-16 left-2 bg-card/80 backdrop-blur-sm p-2 rounded shadow-lg border text-xs text-foreground z-20">
+          <p><strong>Period:</strong> {measurement.start.date} to {measurement.end.date}</p>
+          <p><strong>Start Value:</strong> {measurement.start.value.toFixed(2)}</p>
+          <p><strong>End Value:</strong> {measurement.end.value.toFixed(2)}</p>
+          <p><strong>Change:</strong> <span className={measurement.change >= 0 ? 'text-positive' : 'text-negative'}>{measurement.change.toFixed(2)}</span></p>
+          <p><strong>% Change:</strong> <span className={measurement.percentChange >= 0 ? 'text-positive' : 'text-negative'}>{measurement.percentChange.toFixed(2)}%</span></p>
+        </div>
+      )}
       <ReactECharts
         ref={echartsRef}
         option={option}
         style={{ height: '100%', width: '100%', minHeight: 400, maxHeight: 500 }}
         notMerge={false}
         lazyUpdate={true}
-        onEvents={onEvents}
+        onEvents={{ click: handleChartClick }}
       />
     </div>
   );
