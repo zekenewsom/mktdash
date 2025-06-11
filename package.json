@@ -1,23 +1,27 @@
 {
-    "name": "mktdash-root",
-    "version": "1.0.0",
-    "description": "Root package for the mktdash project",
-    "private": true,
-    "scripts": {
-      "start": "pnpm --parallel start",
-      "start:frontend": "pnpm --filter frontend dev",
-      "start:backend": "pnpm --filter backend dev"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "devDependencies": {},
-    "pnpm": {
-      "peerDependencyRules": {
-        "ignoreMissing": [
-          "@babel/core",
-          "webpack"
-        ]
-      }
+  "name": "mktdash-root",
+  "version": "1.0.0",
+  "description": "Root package for the mktdash project",
+  "private": true,
+  "scripts": {
+    "redis": "redis-server",
+    "start:dev": "pnpm --parallel start",
+    "start:frontend": "pnpm --filter frontend dev",
+    "start:backend": "pnpm --filter backend dev",
+    "dev": "concurrently \"pnpm run redis\" \"pnpm run start:dev\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "@babel/core",
+        "webpack"
+      ]
     }
   }
+}
