@@ -4,6 +4,7 @@ import { generateDailyReport } from '../controllers/reportController';
 import { getSingleCryptoDetails } from '../controllers/cryptoController';
 import { getHomeSnapshot } from '../controllers/overviewController';
 import { getCalendarEvents } from '../controllers/calendarController';
+import * as newsController from '../controllers/newsController';
 
 const router = Router();
 
@@ -28,5 +29,8 @@ router.get('/calendar/events', getCalendarEvents);
 
 // Placeholder route to trigger daily report generation (can be called manually for testing)
 router.post('/report/generate', generateDailyReport);
+
+// News route
+router.get('/news', newsController.handleGetMarketNews);
 
 export default router;

@@ -1,4 +1,189 @@
-# mktdash: Market Analytics Platform
+# mktdash - Market Analytics Dashboard
+
+**mktdash** is a web-based market analytics platform designed to provide insights into U.S. financial markets using publicly available data sources and free APIs. The project aims to deliver a comprehensive dashboard and a daily market summary PDF report. It is built as a monorepo using pnpm workspaces, with a React frontend and a Node.js/Express backend.
+
+**Current Status:** Phase 1 (Optimizing initial structure, implementing core features, and refining UI).
+
+---
+
+## Features
+
+### Current Features:
+* **Market Overview:** Snapshot of key market indices (S&P 500, Nasdaq, DJIA) and their performance.
+* **Macroeconomic Data:** Visualization of key economic indicators from FRED (e.g., Federal Funds Rate, CPI, Unemployment Rate).
+* **Cryptocurrency Data:** Details and market chart data for various cryptocurrencies via CoinGecko.
+* **Economic Calendar:** Displays upcoming economic events using an embed from Investing.com on the frontend.
+* **Daily PDF Summary Report:** Automated generation of a daily market summary report (work in progress).
+* **Interactive Charts:** Data visualization using Plotly.js and Echarts.
+* **Responsive UI:** Built with TailwindCSS and shadcn/ui.
+
+### Planned Features:
+* Expanded data source integration (e.g., IEX Cloud, Trading Economics, Yahoo Finance, Quandl).
+* Advanced technical analysis tools.
+* User accounts and personalized dashboards.
+* More comprehensive and customizable PDF reports.
+* Machine learning insights (placeholder ML service exists in frontend).
+
+---
+
+## Tech Stack
+
+* **Monorepo:** pnpm workspaces
+* **Backend:**
+    * Runtime: Node.js
+    * Framework: Express
+    * Language: TypeScript
+    * Data Sources:
+        * FRED (Federal Reserve Economic Data)
+        * CoinGecko
+    * Caching: Redis
+    * PDF Generation: Puppeteer
+    * Key Libraries: `axios` (for HTTP requests), `dotenv` (for environment variables).
+* **Frontend:**
+    * Framework: React (with Vite)
+    * Language: TypeScript
+    * Styling: TailwindCSS, shadcn/ui
+    * Charting: Plotly.js, Echarts
+    * State Management: TanStack React Query (React Query)
+    * Routing: React Router DOM
+    * Key Libraries: `axios` (for API calls).
+* **DevOps & Tooling:**
+    * ESLint for linting (primarily frontend).
+    * Prettier (likely, for code formatting).
+    * Git for version control.
+
+---
+
+## Project Structure
+
+The project is organized into a monorepo with two main packages:
+
+zekenewsom-mktdash/
+├── packages/
+│   ├── backend/
+│   │   ├── src/
+│   │   │   ├── controllers/  # Request handlers
+│   │   │   ├── services/     # Business logic, data fetching, external API interactions
+│   │   │   ├── routes/       # API route definitions
+│   │   │   ├── utils/        # Utility functions (date, fetch, Redis)
+│   │   │   └── index.ts      # Backend server entry point
+│   │   ├── .env.example      # Environment variable template
+│   │   └── package.json
+│   └── frontend/
+│       ├── src/
+│       │   ├── pages/        # Top-level page components
+│       │   ├── components/   # Reusable UI components (general, UI, placeholders)
+│       │   ├── hooks/        # Custom React hooks
+│       │   ├── api/          # Frontend API service calls
+│       │   ├── lib/          # Utility functions
+│       │   ├── styles/       # Global styles
+│       │   ├── App.tsx       # Main app component with routing
+│       │   └── main.tsx      # Frontend entry point
+│       ├── vite.config.ts    # Vite configuration (including proxy)
+│       └── package.json
+├── package.json              # Root package.json for workspace scripts
+└── pnpm-workspace.yaml       # pnpm workspace configuration
+
+
+---
+
+## Configuration
+
+### Backend (`packages/backend/`)
+Create a `.env` file in the `packages/backend/` directory by copying `.env.example`. Key environment variables include:
+* `PORT`: Port for the backend server (default: 3001).
+* `FRED_API_KEY`: Your API key for FRED.
+* `COINGECKO_API_KEY`: Your API key for CoinGecko (Note: CoinGecko's public API is generally keyless but rate-limited; a key might be for a paid tier if used).
+* `REDIS_URL`: Connection URL for your Redis instance (e.g., `redis://localhost:6379`).
+* `COINGECKO_CACHE_TTL`: Cache Time-To-Live for CoinGecko data (e.g., `60` for 60 seconds).
+* `FRED_HISTORY_CACHE_TTL`: Cache TTL for FRED historical series (e.g., `86400` for 24 hours).
+* `FRED_DAILY_CACHE_TTL`: Cache TTL for FRED daily data (e.g., `3600` for 1 hour).
+
+### Frontend (`packages/frontend/`)
+* `vite.config.ts`: Contains the proxy configuration for API requests. By default, requests to `/api` are proxied to `http://localhost:3001` (the backend server).
+
+---
+
+## Getting Started
+
+### Prerequisites
+* Node.js (LTS version recommended)
+* pnpm (latest version recommended)
+* A running Redis instance.
+* API Keys:
+    * FRED API Key
+    * CoinGecko API Key (if applicable for your usage level)
+
+### Installation
+1.  Clone the repository:
+    ```bash
+    git clone <repository-url>
+    cd zekenewsom-mktdash
+    ```
+2.  Install dependencies for all packages using pnpm:
+    ```bash
+    pnpm install
+    ```
+3.  Set up backend environment variables:
+    * Navigate to `packages/backend/`.
+    * Copy `.env.example` to `.env`.
+    * Fill in your API keys and Redis URL in the new `.env` file.
+
+### Running the Project
+You can run both the backend and frontend concurrently from the root directory:
+```bash
+pnpm dev
+```
+
+This will typically start:
+
+    Backend server on http://localhost:3001 (or the port specified in .env).
+    Frontend development server (Vite) on http://localhost:5173 (or another available port).
+
+Alternatively, you can run them separately:
+
+    To start the backend:
+    ```bash
+    pnpm --filter backend dev
+    ```
+
+    To start the frontend:
+    ```bash
+    pnpm --filter frontend dev
+    ```
+
+Open your browser and navigate to the frontend URL (usually http://localhost:5173).
+
+## Key API Endpoints (Backend)
+
+The backend exposes several RESTful API endpoints under the /api prefix. Some key endpoints include:
+
+    GET /api/overview/snapshot: Retrieves an aggregated snapshot of market data for the homepage.
+    GET /api/macro: Fetches general macroeconomic data series.
+    GET /api/market-indices: Retrieves data for major market indices (S&P 500, Nasdaq, DJIA).
+    GET /api/series/:seriesId: Fetches detailed historical data for a specific FRED series ID.
+    GET /api/series/:seriesId/details: Fetches details and recent values for a specific FRED series ID.
+    GET /api/crypto/:cryptoId: Fetches details for a specific cryptocurrency from CoinGecko.
+    GET /api/crypto/:cryptoId/market_chart: Fetches market chart data for a specific cryptocurrency.
+    POST /api/report/generate: Generates a daily market summary PDF report.
+
+(Note: The /api/calendar/events endpoint is deprecated as calendar functionality is now frontend-based).
+
+---
+
+## Optimization & Development Notes
+
+This project is actively being optimized. Key areas of focus include:
+
+    Standardizing caching mechanisms (consolidating on Redis).
+    Refactoring report generation for better maintainability.
+    Improving error handling and configuration management.
+    Removing unused or redundant code.
+    Enhancing code documentation.
+    Establishing a comprehensive testing suite.
+
+The frontend makes use of placeholder components for features that are still under development or awaiting full data integration.
+
 
 ## Project Objective
 
