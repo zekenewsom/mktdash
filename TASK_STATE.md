@@ -1,6 +1,6 @@
 # mktdash — Dynamic Ops Board
 
-Last updated: 2026-02-25 22:24 EST
+Last updated: 2026-02-26 00:03 EST
 Status: ACTIVE
 Mode: Rolling Kanban (dynamic reprioritization)
 
@@ -13,8 +13,8 @@ Mode: Rolling Kanban (dynamic reprioritization)
 
 ## NOW (in-flight / next 24h)
 - [ ] **S0-001** Keep phone preview running + verify external reachability — **Owner: DAE**
-- [ ] **S0-002** Set backend `.env` for stable data-source behavior — **Owner: DAE**
-- [ ] **S1-001** Start canonical schema file + API error envelope — **Owner: DAE**
+- [x] **S0-002** Set backend `.env` for stable data-source behavior — **Owner: DAE**
+- [x] **S1-001** Start canonical schema file + API error envelope — **Owner: DAE**
 - [ ] **S1-002** Add basic health endpoint for service/data freshness — **Owner: DAE**
 - [ ] **OPS-001** Merge PHR plan deltas into board as they arrive (no static freeze) — **Owner: DAE/PHR**
 
@@ -35,6 +35,8 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **D-001** Initial 10-week robustness plan drafted by PHR
 - [x] **D-002** Initial execution board created (`TASK_STATE.md`)
 - [x] **D-003** Local preview stack bootstrapped (frontend/backend run confirmed)
+- [x] **D-004** Backend env behavior stabilized with provider mode + timeout defaults
+- [x] **D-005** Canonical data contract + API error envelope scaffolded
 
 ---
 

@@ -1,74 +1,64 @@
 import { Request, Response } from 'express';
-
-// Placeholder controller for fetching macroeconomic data
 import { fetchMacroData } from '../services/fredService';
+import { fetchIndexPerformance, fetchIndexHistory, fetchFredSeriesHistory } from '../services/marketDataService';
+import { sendError, sendSuccess } from '../lib/apiResponse';
 
-export const getMacroData = async (req: Request, res: Response) => {
-  // Fetch macroeconomic indicators from FRED API via service
+export const getMacroData = async (_req: Request, res: Response) => {
   const seriesIds = ['FEDFUNDS', 'CPIAUCSL', 'UNRATE'];
+
   try {
     const result = await fetchMacroData(seriesIds);
     if (result.error) {
-      // Return 500 with fallback/mock data and error message
-      return res.status(500).json({ error: result.error, data: result.data });
+      return sendError(res, 'UPSTREAM_FRED_ERROR', result.error, 500, undefined, result.data);
     }
-    // Success: return the data
-    return res.status(200).json(result.data);
+    return sendSuccess(res, result.data);
   } catch (err: any) {
-    return res.status(500).json({ error: err.message || 'Unknown error', data: null });
+    return sendError(res, 'INTERNAL_ERROR', err.message || 'Unknown error', 500);
   }
 };
 
-// New: Historical index data controller
 export const getIndexHistory = async (req: Request, res: Response) => {
-  // Backwards compatible for index history
-
   const { index } = req.query;
   if (!index || typeof index !== 'string') {
-    return res.status(400).json({ error: 'Missing or invalid index query param' });
+    return sendError(res, 'VALIDATION_ERROR', 'Missing or invalid index query param', 400);
   }
+
   try {
     const result = await fetchIndexHistory(index);
     if (result.error) {
-      return res.status(500).json({ error: result.error, data: result.data });
+      return sendError(res, 'UPSTREAM_FRED_ERROR', result.error, 500, { index }, result.data);
     }
-    return res.status(200).json(result.data);
+    return sendSuccess(res, result.data);
   } catch (err: any) {
-    return res.status(500).json({ error: err.message || 'Unknown error', data: null });
+    return sendError(res, 'INTERNAL_ERROR', err.message || 'Unknown error', 500);
   }
 };
 
-// Generic historical data controller for any FRED series
 export const getSeriesHistory = async (req: Request, res: Response) => {
   const { series } = req.query;
   if (!series || typeof series !== 'string') {
-    return res.status(400).json({ error: 'Missing or invalid series query param' });
+    return sendError(res, 'VALIDATION_ERROR', 'Missing or invalid series query param', 400);
   }
+
   try {
     const result = await fetchFredSeriesHistory(series);
     if (result.error) {
-      return res.status(500).json({ error: result.error, data: result.data });
+      return sendError(res, 'UPSTREAM_FRED_ERROR', result.error, 500, { series }, result.data);
     }
-    return res.status(200).json(result.data);
+    return sendSuccess(res, result.data);
   } catch (err: any) {
-    return res.status(500).json({ error: err.message || 'Unknown error', data: null });
+    return sendError(res, 'INTERNAL_ERROR', err.message || 'Unknown error', 500);
   }
 };
 
-// Placeholder controller for fetching market index performance
-import { fetchIndexPerformance, fetchIndexHistory, fetchFredSeriesHistory } from '../services/marketDataService';
-
-export const getMarketIndices = async (req: Request, res: Response) => {
-  // Fetch market indices from FRED (value, date)
-
-  // Fetch market indices from Alpha Vantage (or fallback)
+export const getMarketIndices = async (_req: Request, res: Response) => {
   try {
     const result = await fetchIndexPerformance();
     if (result.error) {
-      return res.status(500).json({ error: result.error, data: result.data });
+      return sendError(res, 'UPSTREAM_FRED_ERROR', result.error, 500, undefined, result.data);
     }
-    return res.status(200).json(result.data);
+    return sendSuccess(res, result.data);
   } catch (err: any) {
-    return res.status(500).json({ error: err.message || 'Unknown error', data: null });
+    return sendError(res, 'INTERNAL_ERROR', err.message || 'Unknown error', 500);
   }
 };
