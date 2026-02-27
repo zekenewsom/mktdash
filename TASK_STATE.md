@@ -12,7 +12,9 @@ Mode: Rolling Kanban (dynamic reprioritization)
 ---
 
 ## NOW (in-flight / next 24h)
-- [ ] **S0-001** Keep phone preview running + verify external reachability — **Owner: DAE**
+- [ ] **S0-001** Keep phone preview running + verify private tailnet reachability — **Owner: DAE**
+- [ ] **S2-012** Staging prep: configure free deployment targets (Render backend + Vercel frontend) with env placeholders — **Owner: DAE**
+- [ ] **S2-013** Execute key-rotation hygiene pass (scrub examples + add scan hooks) — **Owner: DAE**
 - [x] **S0-002** Set backend `.env` for stable data-source behavior — **Owner: DAE**
 - [x] **S1-001** Start canonical schema file + API error envelope — **Owner: DAE**
 - [x] **S1-002** Add basic health endpoint for service/data freshness — **Owner: DAE**
@@ -45,9 +47,7 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **T1-006** Add frontend quality panel placeholder — **Owner: DAE**
 
 ## BLOCKED (waiting on decision/input)
-- [ ] **B-001** Confirm preferred phone access path (private Tailnet vs public HTTPS deploy) — **Owner: HUM**
-- [ ] **B-002** Select deployment target for staging (Vercel/Render/Fly/self-host) — **Owner: HUM**
-- [ ] **B-003** Confirm if we rotate existing API keys found in sample envs before wider rollout — **Owner: HUM/DAE**
+- [ ] **B-004** Complete Tailscale setup on all systems and validate private access path end-to-end — **Owner: HUM**
 
 ## DONE
 - [x] **D-001** Initial 10-week robustness plan drafted by PHR
@@ -122,3 +122,6 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - **2026-02-25:** Adopted 10-week phased robustness plan with milestone acceptance criteria.
 - **2026-02-25:** Responsive web on phone first; native app deferred.
 - **2026-02-25:** Converted board to dynamic Kanban mode (`NOW/NEXT/BLOCKED/DONE`).
+- **2026-02-27:** Access path set to private tailnet-only.
+- **2026-02-27:** Staging target set to free-tier combo: Vercel (frontend) + Render (backend).
+- **2026-02-27:** Key hygiene decision set to rotate now.
