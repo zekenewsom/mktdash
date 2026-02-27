@@ -1,0 +1,54 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install deps (backend)
+        run: corepack pnpm --filter backend install --frozen-lockfile
+
+      - name: Install deps (frontend)
+        run: corepack pnpm --filter frontend install --frozen-lockfile
+
+      - name: Secret scan
+        run: npm run secret:scan
+
+      - name: Build backend
+        run: corepack pnpm --filter backend build
+
+      - name: Build frontend
+        run: corepack pnpm --filter frontend build
+
+      - name: Start backend
+        run: |
+          cd packages/backend
+          node dist/index.js &
+          echo $! > /tmp/mktdash_backend.pid
+          sleep 4
+
+      - name: Run loadtest gate (local)
+        run: |
+          cd packages/backend
+          LOADTEST_BASE_URL=http://localhost:3001 LOADTEST_CONCURRENCY=2 LOADTEST_ROUNDS=3 node loadtest/endpoints.js > /tmp/loadtest.json
+          node loadtest/assert-thresholds.js /tmp/loadtest.json
+
+      - name: Stop backend
+        if: always()
+        run: |
+          if [ -f /tmp/mktdash_backend.pid ]; then kill $(cat /tmp/mktdash_backend.pid) || true; fi

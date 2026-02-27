@@ -61,11 +61,11 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **T2-005** Add caching + timeout/retry policy by provider — **Owner: DAE**
 - [x] **T2-006** Add rate limiting + abuse controls — **Owner: DAE**
 - [x] **T2-007** Add load tests for top 5 endpoints — **Owner: DAE**
-- [ ] **T2-008** Add CI gate for latency/error thresholds — **Owner: DAE**
+- [x] **T2-008** Add CI gate for latency/error thresholds — **Owner: DAE**
 
 ### Phase 3 — Frontend UX Resilience (W3–W4 overlap)
 - [x] **T3-001** Standard loading/empty/error/offline states — **Owner: DAE**
-- [ ] **T3-002** Route-level error boundaries — **Owner: DAE**
+- [x] **T3-002** Route-level error boundaries — **Owner: DAE**
 - [ ] **T3-003** Mobile breakpoints + chart responsiveness pass — **Owner: DAE**
 - [ ] **T3-004** A11y quick audit (critical WCAG checks) — **Owner: DAE**
 
@@ -122,3 +122,4 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - **2026-02-27:** Completed API docs tranche (`T2-002`, `T2-003`) with `openapi.yaml` artifact and `/api/docs/openapi` endpoint.
 - **2026-02-27:** Added baseline rate limiting + staging load-test harness (`T2-006`, `T2-007`); observed high p95 under free-tier cold starts.
 - **2026-02-27:** Applied CORS hotfix on backend to resolve cross-origin frontend network errors in Vercel->Render staging flow.
+- **2026-02-27:** Added CI workflow with local latency/error gate and implemented frontend error boundary (`T2-008`, `T3-002`).
