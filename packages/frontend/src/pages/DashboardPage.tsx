@@ -66,6 +66,18 @@ const DashboardPage: React.FC = () => {
   const [intelligenceLoading, setIntelligenceLoading] = React.useState(false);
   const [intelligenceError, setIntelligenceError] = React.useState<string | null>(null);
   const [backendHeartbeat, setBackendHeartbeat] = React.useState<'ok' | 'degraded'>('degraded');
+  const [isOnline, setIsOnline] = React.useState<boolean>(typeof navigator !== 'undefined' ? navigator.onLine : true);
+
+  React.useEffect(() => {
+    const onOnline = () => setIsOnline(true);
+    const onOffline = () => setIsOnline(false);
+    window.addEventListener('online', onOnline);
+    window.addEventListener('offline', onOffline);
+    return () => {
+      window.removeEventListener('online', onOnline);
+      window.removeEventListener('offline', onOffline);
+    };
+  }, []);
 
   React.useEffect(() => {
     setLoading(true);
@@ -151,11 +163,20 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="mb-3 text-xs">
+      <div className="mb-3 text-xs flex flex-wrap gap-2">
         <span className={`inline-flex items-center rounded px-2 py-1 ${backendHeartbeat === 'ok' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
           backend: {backendHeartbeat}
         </span>
+        <span className={`inline-flex items-center rounded px-2 py-1 ${isOnline ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'}`}>
+          network: {isOnline ? 'online' : 'offline'}
+        </span>
       </div>
+
+      {!isOnline && (
+        <div className="mb-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          You appear offline. Dashboard data may be stale until connection is restored.
+        </div>
+      )}
 
       {/* Tier-1 intelligence row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">

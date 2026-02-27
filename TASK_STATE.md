@@ -18,8 +18,9 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **S3-004** Validate deterministic replay counts (`T1-009`) with acceptance report — **Owner: DAE**
 - [x] **S3-005** Add request timing + p95 telemetry (`T2-004`) and expose metrics endpoint — **Owner: DAE**
 - [x] **S3-006** Add provider cache + timeout/retry policy (`T2-005`) for FRED/calendar — **Owner: DAE**
-- [ ] **S3-007** Frontend resilience pass 1 (`T3-001`): standard loading/empty/error/offline states for all intelligence cards — **Owner: DAE**
+- [x] **S3-007** Frontend resilience pass 1 (`T3-001`): standard loading/empty/error/offline states for all intelligence cards — **Owner: DAE**
 - [ ] **S3-008** Run replay/backfill validation in staging env with live provider keys and capture non-zero baseline report — **Owner: DAE**
+- [ ] **S3-009** Staging smoke-test new observability endpoints (`/api/health/metrics`, enhanced `/api/health/data-quality`) after deploy — **Owner: DAE**
 
 ## NEXT (queued / this week)
 - [x] **T1-001** Create canonical market data schemas (`symbol`, `source`, `as_of`, `value`, `unit`, `quality_flags`) — **Owner: DAE**
@@ -59,7 +60,7 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [ ] **T2-008** Add CI gate for latency/error thresholds — **Owner: DAE**
 
 ### Phase 3 — Frontend UX Resilience (W3–W4 overlap)
-- [ ] **T3-001** Standard loading/empty/error/offline states — **Owner: DAE**
+- [x] **T3-001** Standard loading/empty/error/offline states — **Owner: DAE**
 - [ ] **T3-002** Route-level error boundaries — **Owner: DAE**
 - [ ] **T3-003** Mobile breakpoints + chart responsiveness pass — **Owner: DAE**
 - [ ] **T3-004** A11y quick audit (critical WCAG checks) — **Owner: DAE**

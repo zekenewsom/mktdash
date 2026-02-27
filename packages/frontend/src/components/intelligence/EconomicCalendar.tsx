@@ -37,6 +37,10 @@ const EconomicCalendar: React.FC = () => {
       {loading && <p className="text-sm text-muted-foreground mt-2">Loading calendar...</p>}
       {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
 
+      {(!loading && !error && events.length === 0) && (
+        <p className="text-sm text-muted-foreground mt-3">No upcoming events available right now.</p>
+      )}
+
       <ul className="mt-3 space-y-2 text-sm">
         {events.map((event) => (
           <li key={event.id} className="border-b border-border pb-2 last:border-b-0">

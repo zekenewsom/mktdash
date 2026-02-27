@@ -53,6 +53,10 @@ const DataQualityConsole: React.FC = () => {
             <span>fallback: <strong className="text-foreground">{data.totals.fallback_count}</strong></span>
           </div>
 
+          {data.records.length === 0 && (
+            <p className="text-sm text-muted-foreground mt-3">No quality records available yet.</p>
+          )}
+
           <ul className="mt-3 space-y-2 text-sm">
             {data.records.slice(0, 6).map((r) => (
               <li key={r.symbol} className="border-b border-border pb-1 last:border-b-0">
