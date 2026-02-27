@@ -1,6 +1,6 @@
 # mktdash — Dynamic Ops Board
 
-Last updated: 2026-02-26 00:03 EST
+Last updated: 2026-02-27 13:55 EST
 Status: ACTIVE
 Mode: Rolling Kanban (dynamic reprioritization)
 
@@ -11,34 +11,14 @@ Mode: Rolling Kanban (dynamic reprioritization)
 
 ---
 
-## NOW (in-flight / next 24h)
-- [x] **S0-001** Keep phone preview running + verify private tailnet reachability — **Owner: DAE**
-- [x] **S2-012** Staging prep: configure free deployment targets (Render backend + Vercel frontend) with env placeholders — **Owner: DAE**
-- [x] **S2-013** Execute key-rotation hygiene pass (scrub examples + add scan hooks) — **Owner: DAE**
-- [x] **S2-014** Staging compatibility: switch frontend API calls to configurable `VITE_API_BASE_URL` client — **Owner: DAE**
-- [x] **S2-015** Staging smoke test: verify frontend -> Render API connectivity after Vercel env/redeploy — **Owner: DAE**
-- [x] **S0-002** Set backend `.env` for stable data-source behavior — **Owner: DAE**
-- [x] **S1-001** Start canonical schema file + API error envelope — **Owner: DAE**
-- [x] **S1-002** Add basic health endpoint for service/data freshness — **Owner: DAE**
-- [x] **S1-003** Complete module value audit (info-first scoring + launch layout) — **Owner: PHR**
-- [x] **S1-004** Publish coding+commit plan for Sprint 1 (frontend info architecture) — **Owner: PHR**
-- [x] **S1-005** Start Session 1 coding: add frontend intelligence contracts — **Owner: DAE**
-- [x] **S1-006** Start Session 2 coding: add RegimeStateCard + WhatChangedPanel shells — **Owner: DAE**
-- [x] **S1-007** Backend kickoff: define live-data endpoints for regime + material changes — **Owner: DAE/PHR**
-- [x] **S1-008** Frontend wiring: replace fixtures with `/api/intelligence/overview` data fetch — **Owner: DAE**
-- [x] **S1-009** Backend refinement: add explicit fallback/confidence badges from `quality_flags` in intelligence payload — **Owner: DAE**
-- [x] **S2-001** Sprint 2 kickoff: add `stale_used/stale_count` and confidence downgrade rules to intelligence overview — **Owner: DAE**
-- [x] **S2-002** Sprint 2: ship Top-row trust UX (source + stale/fallback badges in regime card) — **Owner: DAE**
-- [x] **S2-003** Sprint 2: add `/api/health/data-quality` baseline fields for frontend quality console — **Owner: DAE**
-- [x] **S2-004** Sprint 2: scaffold economic calendar API + frontend placeholder replacement — **Owner: DAE**
-- [x] **S2-005** Sprint 2: wire frontend Data Quality Console shell to `/api/health/data-quality` — **Owner: DAE**
-- [x] **S2-006** Sprint 2: replace calendar scaffold source with live free-source ingestion (API/RSS-first) — **Owner: DAE/SOPHIA**
-- [x] **S2-007** Sprint 2: replace placeholder table with Cross-Asset Confirmation Matrix shell — **Owner: DAE**
-- [x] **S2-008** Sprint 2: wire Cross-Asset Confirmation Matrix to live signals endpoint — **Owner: DAE**
-- [x] **OPS-001** Merge PHR plan deltas into board as they arrive (no static freeze) — **Owner: DAE/PHR**
-- [x] **S2-009** Sprint 2: add bundle-size reduction pass (lazy-load heavy chart/report components) — **Owner: DAE**
-- [x] **S2-010** Sprint 2: add lightweight backend status endpoint and dashboard heartbeat badge — **Owner: DAE**
-- [x] **S2-011** Sprint 2: promote calendar and quality modules into a dedicated intelligence row layout — **Owner: DAE**
+## NOW (recalibrated next 72h)
+- [ ] **S3-001** Finish ingestion quality metrics (`T1-004`): freshness/completeness/drift for intelligence + calendar + quality datasets — **Owner: DAE**
+- [ ] **S3-002** Build idempotent replay/backfill job (`T1-007`) with 7-day window and deterministic keys — **Owner: DAE**
+- [ ] **S3-003** Author replay runbook (`T1-008`) with rollback/retry procedure — **Owner: PHR/DAE**
+- [ ] **S3-004** Validate deterministic replay counts (`T1-009`) with acceptance report — **Owner: DAE**
+- [ ] **S3-005** Add request timing + p95 telemetry (`T2-004`) and expose metrics endpoint — **Owner: DAE**
+- [ ] **S3-006** Add provider cache + timeout/retry policy (`T2-005`) for FRED/calendar — **Owner: DAE**
+- [ ] **S3-007** Frontend resilience pass 1 (`T3-001`): standard loading/empty/error/offline states for all intelligence cards — **Owner: DAE**
 
 ## NEXT (queued / this week)
 - [x] **T1-001** Create canonical market data schemas (`symbol`, `source`, `as_of`, `value`, `unit`, `quality_flags`) — **Owner: DAE**
@@ -49,7 +29,7 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **T1-006** Add frontend quality panel placeholder — **Owner: DAE**
 
 ## BLOCKED (waiting on decision/input)
-- [ ] **B-008** Choose next delivery priority: (A) ingestion hardening T1-004/T1-007, (B) API quality T2-004/T2-005, (C) frontend resilience T3-001/T3-002 — **Owner: HUM**
+- [ ] **B-009** Confirm report-engine v1 scope before Phase 4 starts (`T4-001` format, sections, and output cadence) — **Owner: HUM**
 
 ## DONE
 - [x] **D-001** Initial 10-week robustness plan drafted by PHR
@@ -131,3 +111,4 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - **2026-02-27:** Render and Vercel project connections confirmed.
 - **2026-02-27:** Vercel env + redeploy confirmed; frontend now points to Render backend URL.
 - **2026-02-27:** Key rotation confirmed complete by human.
+- **2026-02-27:** Plan recalibrated to prioritize ingestion hardening + observability before broader API/UX expansion.
