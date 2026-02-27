@@ -1,7 +1,7 @@
 import React from 'react';
 import MarketOverviewCard from '../components/placeholders/MarketOverviewCard';
 import ChartContainer from '../components/placeholders/ChartContainer';
-import ReportViewer from '../components/placeholders/ReportViewer';
+const ReportViewer = React.lazy(() => import('../components/placeholders/ReportViewer'));
 import RegimeStateCard from '../components/intelligence/RegimeStateCard';
 import WhatChangedPanel from '../components/intelligence/WhatChangedPanel';
 import DataQualityConsole from '../components/intelligence/DataQualityConsole';
@@ -195,8 +195,10 @@ const DashboardPage: React.FC = () => {
       </div>
 
       {/* Report Viewer (example layout: spans 3 columns, or could be in a modal) */}
-       <div className="lg:col-span-3">
-        <ReportViewer />
+      <div className="lg:col-span-3">
+        <React.Suspense fallback={<div className="text-sm text-muted-foreground">Loading report module...</div>}>
+          <ReportViewer />
+        </React.Suspense>
       </div>
 
       {/* Add more placeholder widgets here as needed */}

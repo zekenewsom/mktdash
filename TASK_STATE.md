@@ -32,7 +32,8 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **S2-007** Sprint 2: replace placeholder table with Cross-Asset Confirmation Matrix shell — **Owner: DAE**
 - [x] **S2-008** Sprint 2: wire Cross-Asset Confirmation Matrix to live signals endpoint — **Owner: DAE**
 - [x] **OPS-001** Merge PHR plan deltas into board as they arrive (no static freeze) — **Owner: DAE/PHR**
-- [ ] **S2-009** Sprint 2: add bundle-size reduction pass (lazy-load heavy chart/report components) — **Owner: DAE**
+- [x] **S2-009** Sprint 2: add bundle-size reduction pass (lazy-load heavy chart/report components) — **Owner: DAE**
+- [ ] **S2-010** Sprint 2: add lightweight backend status endpoint and dashboard heartbeat badge — **Owner: DAE**
 
 ## NEXT (queued / this week)
 - [ ] **T1-001** Create canonical market data schemas (`symbol`, `source`, `as_of`, `value`, `unit`, `quality_flags`) — **Owner: DAE**
