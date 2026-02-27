@@ -29,7 +29,8 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **S2-004** Sprint 2: scaffold economic calendar API + frontend placeholder replacement — **Owner: DAE**
 - [x] **S2-005** Sprint 2: wire frontend Data Quality Console shell to `/api/health/data-quality` — **Owner: DAE**
 - [x] **S2-006** Sprint 2: replace calendar scaffold source with live free-source ingestion (API/RSS-first) — **Owner: DAE/SOPHIA**
-- [ ] **S2-007** Sprint 2: replace placeholder table with Cross-Asset Confirmation Matrix shell — **Owner: DAE**
+- [x] **S2-007** Sprint 2: replace placeholder table with Cross-Asset Confirmation Matrix shell — **Owner: DAE**
+- [ ] **S2-008** Sprint 2: wire Cross-Asset Confirmation Matrix to live signals endpoint — **Owner: DAE**
 - [ ] **OPS-001** Merge PHR plan deltas into board as they arrive (no static freeze) — **Owner: DAE/PHR**
 
 ## NEXT (queued / this week)
