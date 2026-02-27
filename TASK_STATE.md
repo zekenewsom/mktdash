@@ -21,7 +21,8 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **S3-007** Frontend resilience pass 1 (`T3-001`): standard loading/empty/error/offline states for all intelligence cards — **Owner: DAE**
 - [ ] **S3-008** Run replay/backfill validation in staging env with live provider keys and capture non-zero baseline report — **Owner: DAE**
 - [x] **S3-012** Execute load test baseline on staging endpoints and capture p50/p95/error rates — **Owner: DAE**
-- [ ] **S3-013** Tune rate-limit thresholds and add endpoint-specific policy defaults for staging vs prod — **Owner: DAE**
+- [x] **S3-013** Tune rate-limit thresholds and add endpoint-specific policy defaults for staging vs prod — **Owner: DAE**
+- [ ] **S3-014** Deploy latest backend/frontend commits and re-verify dashboard modules from Vercel in-browser — **Owner: DAE/HUM**
 - [x] **S3-009** Staging smoke-test new observability endpoints (`/api/health/metrics`, enhanced `/api/health/data-quality`) after deploy — **Owner: DAE**
 - [x] **S3-010** API quality pass: generate OpenAPI spec for live routes (`T2-002`) — **Owner: DAE**
 - [x] **S3-011** API quality pass: publish docs artifact endpoint (`T2-003`) — **Owner: DAE**
@@ -66,8 +67,8 @@ Mode: Rolling Kanban (dynamic reprioritization)
 ### Phase 3 — Frontend UX Resilience (W3–W4 overlap)
 - [x] **T3-001** Standard loading/empty/error/offline states — **Owner: DAE**
 - [x] **T3-002** Route-level error boundaries — **Owner: DAE**
-- [ ] **T3-003** Mobile breakpoints + chart responsiveness pass — **Owner: DAE**
-- [ ] **T3-004** A11y quick audit (critical WCAG checks) — **Owner: DAE**
+- [x] **T3-003** Mobile breakpoints + chart responsiveness pass — **Owner: DAE**
+- [x] **T3-004** A11y quick audit (critical WCAG checks) — **Owner: DAE**
 
 ### Phase 4 — Report Engine Pipeline (W5–W6)
 - [ ] **T4-001** Define report template schema + input contract — **Owner: PHR/DAE**
@@ -123,3 +124,4 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - **2026-02-27:** Added baseline rate limiting + staging load-test harness (`T2-006`, `T2-007`); observed high p95 under free-tier cold starts.
 - **2026-02-27:** Applied CORS hotfix on backend to resolve cross-origin frontend network errors in Vercel->Render staging flow.
 - **2026-02-27:** Added CI workflow with local latency/error gate and implemented frontend error boundary (`T2-008`, `T3-002`).
+- **2026-02-27:** Completed rate-limit policy tuning + mobile responsiveness + quick accessibility audit (`S3-013`, `T3-003`, `T3-004`).

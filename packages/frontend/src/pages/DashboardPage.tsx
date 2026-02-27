@@ -162,7 +162,7 @@ const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <main className="container mx-auto p-2 md:p-4" aria-label="mktdash dashboard">
       <div className="mb-3 text-xs flex flex-wrap gap-2">
         <span className={`inline-flex items-center rounded px-2 py-1 ${backendHeartbeat === 'ok' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
           backend: {backendHeartbeat}
@@ -242,7 +242,7 @@ const DashboardPage: React.FC = () => {
       </div>
 
       {/* Add more placeholder widgets here as needed */}
-    </div>
+    </main>
   );
 };
 
