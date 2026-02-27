@@ -20,6 +20,8 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **S3-006** Add provider cache + timeout/retry policy (`T2-005`) for FRED/calendar — **Owner: DAE**
 - [x] **S3-007** Frontend resilience pass 1 (`T3-001`): standard loading/empty/error/offline states for all intelligence cards — **Owner: DAE**
 - [ ] **S3-008** Run replay/backfill validation in staging env with live provider keys and capture non-zero baseline report — **Owner: DAE**
+- [x] **S3-012** Execute load test baseline on staging endpoints and capture p50/p95/error rates — **Owner: DAE**
+- [ ] **S3-013** Tune rate-limit thresholds and add endpoint-specific policy defaults for staging vs prod — **Owner: DAE**
 - [x] **S3-009** Staging smoke-test new observability endpoints (`/api/health/metrics`, enhanced `/api/health/data-quality`) after deploy — **Owner: DAE**
 - [x] **S3-010** API quality pass: generate OpenAPI spec for live routes (`T2-002`) — **Owner: DAE**
 - [x] **S3-011** API quality pass: publish docs artifact endpoint (`T2-003`) — **Owner: DAE**
@@ -57,8 +59,8 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **T2-003** Publish docs endpoint/static artifact — **Owner: DAE**
 - [x] **T2-004** Add request timing + p95 metrics — **Owner: DAE**
 - [x] **T2-005** Add caching + timeout/retry policy by provider — **Owner: DAE**
-- [ ] **T2-006** Add rate limiting + abuse controls — **Owner: DAE**
-- [ ] **T2-007** Add load tests for top 5 endpoints — **Owner: DAE**
+- [x] **T2-006** Add rate limiting + abuse controls — **Owner: DAE**
+- [x] **T2-007** Add load tests for top 5 endpoints — **Owner: DAE**
 - [ ] **T2-008** Add CI gate for latency/error thresholds — **Owner: DAE**
 
 ### Phase 3 — Frontend UX Resilience (W3–W4 overlap)
@@ -118,3 +120,4 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - **2026-02-27:** Plan recalibrated to prioritize ingestion hardening + observability before broader API/UX expansion.
 - **2026-02-27:** Completed ingestion hardening + observability tranche (`T1-004`, `T1-007..009`, `T2-004..005`), with staging replay validation queued.
 - **2026-02-27:** Completed API docs tranche (`T2-002`, `T2-003`) with `openapi.yaml` artifact and `/api/docs/openapi` endpoint.
+- **2026-02-27:** Added baseline rate limiting + staging load-test harness (`T2-006`, `T2-007`); observed high p95 under free-tier cold starts.

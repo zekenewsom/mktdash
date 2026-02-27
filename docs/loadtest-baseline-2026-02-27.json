@@ -1,0 +1,43 @@
+{
+  "base": "https://mktdash-backend-staging.onrender.com",
+  "rounds": 10,
+  "concurrency": 5,
+  "report": {
+    "/api/intelligence/overview": {
+      "count": 50,
+      "p50_ms": 167.99,
+      "p95_ms": 11349.89,
+      "max_ms": 11524.32,
+      "error_count": 0
+    },
+    "/api/health/data-quality": {
+      "count": 50,
+      "p50_ms": 180.2,
+      "p95_ms": 11292.53,
+      "max_ms": 11591.92,
+      "error_count": 0
+    },
+    "/api/calendar/events": {
+      "count": 50,
+      "p50_ms": 184.17,
+      "p95_ms": 7003.49,
+      "max_ms": 10686.87,
+      "error_count": 0
+    },
+    "/api/history?series=SP500": {
+      "count": 50,
+      "p50_ms": 283.21,
+      "p95_ms": 3775.79,
+      "max_ms": 5336.06,
+      "error_count": 0
+    },
+    "/api/market-indices": {
+      "count": 50,
+      "p50_ms": 175.81,
+      "p95_ms": 10474.14,
+      "max_ms": 11581.32,
+      "error_count": 0
+    }
+  },
+  "note": "p95 inflation likely includes Render free-tier cold start behavior."
+}

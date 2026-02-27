@@ -9,6 +9,7 @@
     "dev": "ts-node-dev src/index.ts",
     "backfill:replay": "npm run build && node dist/jobs/backfillReplay.js",
     "backfill:validate": "npm run build && node dist/jobs/validateReplayDeterminism.js",
+    "loadtest": "node loadtest/endpoints.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
