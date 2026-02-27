@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import DashboardPage from './pages/DashboardPage';
 
 function App() {
