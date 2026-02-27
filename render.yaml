@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: mktdash-backend-staging
+    env: node
+    rootDir: packages/backend
+    plan: free
+    buildCommand: corepack pnpm install --frozen-lockfile && corepack pnpm --filter backend build
+    startCommand: corepack pnpm --filter backend start
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: PORT
+        value: 3001
+      - key: DATA_PROVIDER_MODE
+        value: live_with_fallback
+      - key: HTTP_TIMEOUT_MS
+        value: 8000
+      - key: FRED_API_KEY
+        sync: false
+      - key: ALPHAVANTAGE_API_KEY
+        sync: false

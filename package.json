@@ -6,7 +6,9 @@
     "scripts": {
       "start": "pnpm --parallel start",
       "start:frontend": "pnpm --filter frontend dev",
-      "start:backend": "pnpm --filter backend dev"
+      "start:backend": "pnpm --filter backend dev",
+      "secret:scan": "bash ./scripts/secret-scan.sh",
+      "hooks:install": "git config core.hooksPath .githooks"
     },
     "keywords": [],
     "author": "",
