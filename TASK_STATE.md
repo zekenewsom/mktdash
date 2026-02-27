@@ -121,3 +121,4 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - **2026-02-27:** Completed ingestion hardening + observability tranche (`T1-004`, `T1-007..009`, `T2-004..005`), with staging replay validation queued.
 - **2026-02-27:** Completed API docs tranche (`T2-002`, `T2-003`) with `openapi.yaml` artifact and `/api/docs/openapi` endpoint.
 - **2026-02-27:** Added baseline rate limiting + staging load-test harness (`T2-006`, `T2-007`); observed high p95 under free-tier cold starts.
+- **2026-02-27:** Applied CORS hotfix on backend to resolve cross-origin frontend network errors in Vercel->Render staging flow.
