@@ -49,7 +49,7 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **T1-006** Add frontend quality panel placeholder — **Owner: DAE**
 
 ## BLOCKED (waiting on decision/input)
-- [ ] **B-007** Confirm provider key rotation completed at source dashboards (FRED/AlphaVantage if active) — **Owner: HUM**
+- [ ] **B-008** Choose next delivery priority: (A) ingestion hardening T1-004/T1-007, (B) API quality T2-004/T2-005, (C) frontend resilience T3-001/T3-002 — **Owner: HUM**
 
 ## DONE
 - [x] **D-001** Initial 10-week robustness plan drafted by PHR
@@ -130,3 +130,4 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - **2026-02-27:** Tailscale confirmed active on all systems.
 - **2026-02-27:** Render and Vercel project connections confirmed.
 - **2026-02-27:** Vercel env + redeploy confirmed; frontend now points to Render backend URL.
+- **2026-02-27:** Key rotation confirmed complete by human.
