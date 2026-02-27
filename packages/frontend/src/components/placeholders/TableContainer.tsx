@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import apiClient from '../../lib/apiClient';
 
 interface MacroData {
   FEDFUNDS?: { value: number; date: string };
@@ -26,8 +26,8 @@ const TableContainer: React.FC<TableContainerProps> = ({ onSelectIndex, selected
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      axios.get('/api/macro'),
-      axios.get('/api/market-indices'),
+      apiClient.get('/api/macro'),
+      apiClient.get('/api/market-indices'),
     ])
       .then(([macroRes, indicesRes]) => {
         const macroData = macroRes.data.data || macroRes.data;

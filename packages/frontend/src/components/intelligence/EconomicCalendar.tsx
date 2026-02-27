@@ -1,5 +1,5 @@
 import React from 'react';
-import axios from 'axios';
+import apiClient from '../../lib/apiClient';
 
 interface CalendarEvent {
   id: string;
@@ -20,7 +20,7 @@ const EconomicCalendar: React.FC = () => {
     setLoading(true);
     setError(null);
 
-    axios
+    apiClient
       .get('/api/calendar/events')
       .then((res) => {
         const payload = res.data?.data || res.data;

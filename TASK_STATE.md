@@ -15,6 +15,7 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **S0-001** Keep phone preview running + verify private tailnet reachability — **Owner: DAE**
 - [x] **S2-012** Staging prep: configure free deployment targets (Render backend + Vercel frontend) with env placeholders — **Owner: DAE**
 - [x] **S2-013** Execute key-rotation hygiene pass (scrub examples + add scan hooks) — **Owner: DAE**
+- [x] **S2-014** Staging compatibility: switch frontend API calls to configurable `VITE_API_BASE_URL` client — **Owner: DAE**
 - [x] **S0-002** Set backend `.env` for stable data-source behavior — **Owner: DAE**
 - [x] **S1-001** Start canonical schema file + API error envelope — **Owner: DAE**
 - [x] **S1-002** Add basic health endpoint for service/data freshness — **Owner: DAE**

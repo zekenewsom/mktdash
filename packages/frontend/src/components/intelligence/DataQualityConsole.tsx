@@ -1,5 +1,5 @@
 import React from 'react';
-import axios from 'axios';
+import apiClient from '../../lib/apiClient';
 
 interface QualityRecord {
   symbol: string;
@@ -28,7 +28,7 @@ const DataQualityConsole: React.FC = () => {
     setLoading(true);
     setError(null);
 
-    axios
+    apiClient
       .get('/api/health/data-quality')
       .then((res) => {
         const payload = res.data?.data || res.data;

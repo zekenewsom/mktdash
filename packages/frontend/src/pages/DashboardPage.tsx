@@ -9,7 +9,7 @@ import EconomicCalendar from '../components/intelligence/EconomicCalendar';
 import CrossAssetConfirmationMatrix, { CrossAssetRow } from '../components/intelligence/CrossAssetConfirmationMatrix';
 
 // This page component sets up the basic dashboard layout
-import axios from 'axios';
+import apiClient from '../lib/apiClient';
 import { MaterialChange, RegimeState } from '../contracts/intelligence';
 
 const SERIES_LABELS: Record<string, string> = {
@@ -70,7 +70,7 @@ const DashboardPage: React.FC = () => {
   React.useEffect(() => {
     setLoading(true);
     setError(null);
-    axios
+    apiClient
       .get(`/api/history?series=${selectedSeries}`)
       .then((res) => {
         setSeriesHistory(res.data.data || res.data);
@@ -82,7 +82,7 @@ const DashboardPage: React.FC = () => {
   }, [selectedSeries]);
 
   React.useEffect(() => {
-    axios
+    apiClient
       .get('/api/health/status')
       .then((res) => {
         const status = res.data?.data?.status || res.data?.status;
@@ -95,7 +95,7 @@ const DashboardPage: React.FC = () => {
     setIntelligenceLoading(true);
     setIntelligenceError(null);
 
-    axios
+    apiClient
       .get('/api/intelligence/overview')
       .then((res) => {
         const payload = res.data?.data || res.data;
