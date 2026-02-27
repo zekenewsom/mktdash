@@ -6,7 +6,7 @@ import RegimeStateCard from '../components/intelligence/RegimeStateCard';
 import WhatChangedPanel from '../components/intelligence/WhatChangedPanel';
 import DataQualityConsole from '../components/intelligence/DataQualityConsole';
 import EconomicCalendar from '../components/intelligence/EconomicCalendar';
-import CrossAssetConfirmationMatrix from '../components/intelligence/CrossAssetConfirmationMatrix';
+import CrossAssetConfirmationMatrix, { CrossAssetRow } from '../components/intelligence/CrossAssetConfirmationMatrix';
 
 // This page component sets up the basic dashboard layout
 import axios from 'axios';
@@ -21,6 +21,35 @@ const SERIES_LABELS: Record<string, string> = {
   UNRATE: 'Unemployment Rate',
 };
 
+function mapMatrixRowsFromRegime(regimeState: RegimeState): CrossAssetRow[] {
+  const expectedRiskDirection = regimeState.state === 'risk_off' ? 'down' : regimeState.state === 'risk_on' ? 'up' : 'flat';
+
+  const baseRows: CrossAssetRow[] = regimeState.drivers.map((driver) => {
+    const confirmation: CrossAssetRow['confirmation'] =
+      driver.direction === expectedRiskDirection
+        ? 'confirm'
+        : driver.direction === 'flat'
+          ? 'neutral'
+          : 'diverge';
+
+    return {
+      asset: driver.label,
+      signal: driver.direction,
+      confirmation,
+      note: `${driver.impact} impact vs ${regimeState.state.replace('_', ' ')} regime`,
+    };
+  });
+
+  if (baseRows.length >= 4) return baseRows;
+
+  return [
+    ...baseRows,
+    { asset: 'Credit (HY spreads)', signal: 'flat' as const, confirmation: 'neutral' as const, note: 'Awaiting live credit integration' },
+    { asset: 'Volatility (VIX/MOVE)', signal: 'flat' as const, confirmation: 'neutral' as const, note: 'Awaiting live vol integration' },
+    { asset: 'Commodities (WTI/Gold)', signal: 'flat' as const, confirmation: 'neutral' as const, note: 'Awaiting live commodity integration' },
+  ].slice(0, 6);
+}
+
 const DashboardPage: React.FC = () => {
   // In future phases, state management for widget layout will go here
   // For now, use a simple grid structure
@@ -33,6 +62,7 @@ const DashboardPage: React.FC = () => {
 
   const [regime, setRegime] = React.useState<RegimeState | null>(null);
   const [changes, setChanges] = React.useState<MaterialChange[]>([]);
+  const [matrixRows, setMatrixRows] = React.useState<CrossAssetRow[]>([]);
   const [intelligenceLoading, setIntelligenceLoading] = React.useState(false);
   const [intelligenceError, setIntelligenceError] = React.useState<string | null>(null);
 
@@ -94,6 +124,7 @@ const DashboardPage: React.FC = () => {
 
         setRegime(mappedRegime);
         setChanges(mappedChanges);
+        setMatrixRows(mapMatrixRowsFromRegime(mappedRegime));
       })
       .catch((err) => {
         setIntelligenceError(err.message || 'Failed to load intelligence overview');
@@ -152,7 +183,7 @@ const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Cross-asset confirmation matrix */}
         <div className="lg:col-span-3">
-          <CrossAssetConfirmationMatrix />
+          <CrossAssetConfirmationMatrix rows={matrixRows.length ? matrixRows : undefined} />
         </div>
         {/* Economic calendar + quality console */}
         <div className="lg:col-span-2">

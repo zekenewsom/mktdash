@@ -15,7 +15,7 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [ ] **S0-001** Keep phone preview running + verify external reachability — **Owner: DAE**
 - [x] **S0-002** Set backend `.env` for stable data-source behavior — **Owner: DAE**
 - [x] **S1-001** Start canonical schema file + API error envelope — **Owner: DAE**
-- [ ] **S1-002** Add basic health endpoint for service/data freshness — **Owner: DAE**
+- [x] **S1-002** Add basic health endpoint for service/data freshness — **Owner: DAE**
 - [x] **S1-003** Complete module value audit (info-first scoring + launch layout) — **Owner: PHR**
 - [x] **S1-004** Publish coding+commit plan for Sprint 1 (frontend info architecture) — **Owner: PHR**
 - [x] **S1-005** Start Session 1 coding: add frontend intelligence contracts — **Owner: DAE**
@@ -30,16 +30,17 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **S2-005** Sprint 2: wire frontend Data Quality Console shell to `/api/health/data-quality` — **Owner: DAE**
 - [x] **S2-006** Sprint 2: replace calendar scaffold source with live free-source ingestion (API/RSS-first) — **Owner: DAE/SOPHIA**
 - [x] **S2-007** Sprint 2: replace placeholder table with Cross-Asset Confirmation Matrix shell — **Owner: DAE**
-- [ ] **S2-008** Sprint 2: wire Cross-Asset Confirmation Matrix to live signals endpoint — **Owner: DAE**
-- [ ] **OPS-001** Merge PHR plan deltas into board as they arrive (no static freeze) — **Owner: DAE/PHR**
+- [x] **S2-008** Sprint 2: wire Cross-Asset Confirmation Matrix to live signals endpoint — **Owner: DAE**
+- [x] **OPS-001** Merge PHR plan deltas into board as they arrive (no static freeze) — **Owner: DAE/PHR**
+- [ ] **S2-009** Sprint 2: add bundle-size reduction pass (lazy-load heavy chart/report components) — **Owner: DAE**
 
 ## NEXT (queued / this week)
 - [ ] **T1-001** Create canonical market data schemas (`symbol`, `source`, `as_of`, `value`, `unit`, `quality_flags`) — **Owner: DAE**
 - [ ] **T1-002** Add schema versioning strategy + migration notes (`docs/data-contracts.md`) — **Owner: DAE**
 - [ ] **T1-003** Wire validation into ingestion entrypoints — **Owner: DAE**
 - [ ] **T1-004** Add freshness/completeness/drift metrics per dataset — **Owner: DAE**
-- [ ] **T1-005** Expose `/api/health/data-quality` endpoint — **Owner: DAE**
-- [ ] **T1-006** Add frontend quality panel placeholder — **Owner: DAE**
+- [x] **T1-005** Expose `/api/health/data-quality` endpoint — **Owner: DAE**
+- [x] **T1-006** Add frontend quality panel placeholder — **Owner: DAE**
 
 ## BLOCKED (waiting on decision/input)
 - [ ] **B-001** Confirm preferred phone access path (private Tailnet vs public HTTPS deploy) — **Owner: HUM**

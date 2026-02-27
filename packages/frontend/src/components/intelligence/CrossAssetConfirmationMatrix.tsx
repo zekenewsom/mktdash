@@ -3,14 +3,14 @@ import React from 'react';
 type SignalDirection = 'up' | 'down' | 'flat';
 type ConfirmationState = 'confirm' | 'diverge' | 'neutral';
 
-interface CrossAssetRow {
+export interface CrossAssetRow {
   asset: string;
   signal: SignalDirection;
   confirmation: ConfirmationState;
   note: string;
 }
 
-const rows: CrossAssetRow[] = [
+const defaultRows: CrossAssetRow[] = [
   { asset: 'Equities (SPX/NQ)', signal: 'up', confirmation: 'neutral', note: 'Awaiting live matrix wiring' },
   { asset: 'Rates (UST 10Y)', signal: 'up', confirmation: 'diverge', note: 'Higher yields can pressure risk assets' },
   { asset: 'USD (DXY)', signal: 'up', confirmation: 'diverge', note: 'Dollar strength tightens conditions' },
@@ -31,7 +31,11 @@ const confirmationTone: Record<ConfirmationState, string> = {
   neutral: 'text-muted-foreground',
 };
 
-const CrossAssetConfirmationMatrix: React.FC = () => {
+interface CrossAssetConfirmationMatrixProps {
+  rows?: CrossAssetRow[];
+}
+
+const CrossAssetConfirmationMatrix: React.FC<CrossAssetConfirmationMatrixProps> = ({ rows = defaultRows }) => {
   return (
     <section className="bg-card text-card-foreground rounded-lg shadow p-4">
       <h2 className="text-xl font-semibold">Cross-Asset Confirmation Matrix</h2>
