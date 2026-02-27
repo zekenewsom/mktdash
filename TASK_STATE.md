@@ -16,6 +16,7 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **S2-012** Staging prep: configure free deployment targets (Render backend + Vercel frontend) with env placeholders — **Owner: DAE**
 - [x] **S2-013** Execute key-rotation hygiene pass (scrub examples + add scan hooks) — **Owner: DAE**
 - [x] **S2-014** Staging compatibility: switch frontend API calls to configurable `VITE_API_BASE_URL` client — **Owner: DAE**
+- [ ] **S2-015** Staging smoke test: verify frontend -> Render API connectivity after Vercel env/redeploy — **Owner: DAE**
 - [x] **S0-002** Set backend `.env` for stable data-source behavior — **Owner: DAE**
 - [x] **S1-001** Start canonical schema file + API error envelope — **Owner: DAE**
 - [x] **S1-002** Add basic health endpoint for service/data freshness — **Owner: DAE**
@@ -48,7 +49,7 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **T1-006** Add frontend quality panel placeholder — **Owner: DAE**
 
 ## BLOCKED (waiting on decision/input)
-- [ ] **B-005** Connect Vercel + Render accounts to repo and confirm project creation access — **Owner: HUM**
+- [ ] **B-006** Confirm Vercel env var `VITE_API_BASE_URL` is set to Render URL and trigger redeploy — **Owner: HUM**
 
 ## DONE
 - [x] **D-001** Initial 10-week robustness plan drafted by PHR
@@ -127,3 +128,4 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - **2026-02-27:** Staging target set to free-tier combo: Vercel (frontend) + Render (backend).
 - **2026-02-27:** Key hygiene decision set to rotate now.
 - **2026-02-27:** Tailscale confirmed active on all systems.
+- **2026-02-27:** Render and Vercel project connections confirmed.
