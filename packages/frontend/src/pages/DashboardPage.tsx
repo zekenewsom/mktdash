@@ -2,10 +2,11 @@ import React from 'react';
 import MarketOverviewCard from '../components/placeholders/MarketOverviewCard';
 import ChartContainer from '../components/placeholders/ChartContainer';
 import TableContainer from '../components/placeholders/TableContainer';
-import NewsFeed from '../components/placeholders/NewsFeed';
 import ReportViewer from '../components/placeholders/ReportViewer';
 import RegimeStateCard from '../components/intelligence/RegimeStateCard';
 import WhatChangedPanel from '../components/intelligence/WhatChangedPanel';
+import DataQualityConsole from '../components/intelligence/DataQualityConsole';
+import EconomicCalendar from '../components/intelligence/EconomicCalendar';
 
 // This page component sets up the basic dashboard layout
 import axios from 'axios';
@@ -156,9 +157,12 @@ const DashboardPage: React.FC = () => {
             selectedIndex={selectedSeries}
           />
         </div>
-        {/* News Feed */}
+        {/* Economic calendar + quality console */}
+        <div className="lg:col-span-2">
+          <EconomicCalendar />
+        </div>
         <div className="lg:col-span-1">
-          <NewsFeed />
+          <DataQualityConsole />
         </div>
       </div>
 

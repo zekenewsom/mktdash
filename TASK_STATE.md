@@ -26,8 +26,9 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **S2-001** Sprint 2 kickoff: add `stale_used/stale_count` and confidence downgrade rules to intelligence overview — **Owner: DAE**
 - [x] **S2-002** Sprint 2: ship Top-row trust UX (source + stale/fallback badges in regime card) — **Owner: DAE**
 - [x] **S2-003** Sprint 2: add `/api/health/data-quality` baseline fields for frontend quality console — **Owner: DAE**
-- [ ] **S2-004** Sprint 2: scaffold economic calendar API + frontend placeholder replacement — **Owner: DAE**
-- [ ] **S2-005** Sprint 2: wire frontend Data Quality Console shell to `/api/health/data-quality` — **Owner: DAE**
+- [x] **S2-004** Sprint 2: scaffold economic calendar API + frontend placeholder replacement — **Owner: DAE**
+- [x] **S2-005** Sprint 2: wire frontend Data Quality Console shell to `/api/health/data-quality` — **Owner: DAE**
+- [ ] **S2-006** Sprint 2: replace calendar scaffold source with live free-source ingestion (API/RSS-first) — **Owner: DAE/SOPHIA**
 - [ ] **OPS-001** Merge PHR plan deltas into board as they arrive (no static freeze) — **Owner: DAE/PHR**
 
 ## NEXT (queued / this week)
