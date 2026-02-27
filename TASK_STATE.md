@@ -21,7 +21,8 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **S1-005** Start Session 1 coding: add frontend intelligence contracts — **Owner: DAE**
 - [x] **S1-006** Start Session 2 coding: add RegimeStateCard + WhatChangedPanel shells — **Owner: DAE**
 - [x] **S1-007** Backend kickoff: define live-data endpoints for regime + material changes — **Owner: DAE/PHR**
-- [ ] **S1-008** Frontend wiring: replace fixtures with `/api/intelligence/overview` data fetch — **Owner: DAE**
+- [x] **S1-008** Frontend wiring: replace fixtures with `/api/intelligence/overview` data fetch — **Owner: DAE**
+- [ ] **S1-009** Backend refinement: add explicit fallback/confidence badges from `quality_flags` in intelligence payload — **Owner: DAE**
 - [ ] **OPS-001** Merge PHR plan deltas into board as they arrive (no static freeze) — **Owner: DAE/PHR**
 
 ## NEXT (queued / this week)
