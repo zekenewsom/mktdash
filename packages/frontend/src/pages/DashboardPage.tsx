@@ -4,9 +4,12 @@ import ChartContainer from '../components/placeholders/ChartContainer';
 import TableContainer from '../components/placeholders/TableContainer';
 import NewsFeed from '../components/placeholders/NewsFeed';
 import ReportViewer from '../components/placeholders/ReportViewer';
+import RegimeStateCard from '../components/intelligence/RegimeStateCard';
+import WhatChangedPanel from '../components/intelligence/WhatChangedPanel';
 
 // This page component sets up the basic dashboard layout
 import axios from 'axios';
+import { fixtureMaterialChanges, fixtureRegimeState } from '../data/intelligence-fixtures';
 
 const SERIES_LABELS: Record<string, string> = {
   SP500: 'S&P 500',
@@ -49,6 +52,12 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4">
+      {/* Tier-1 intelligence row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <RegimeStateCard regime={fixtureRegimeState} />
+        <WhatChangedPanel changes={fixtureMaterialChanges} />
+      </div>
+
       {/* Market Overview: Top of the dashboard */}
       <div className="w-full mb-6">
         <MarketOverviewCard
