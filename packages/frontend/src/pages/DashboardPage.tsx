@@ -196,6 +196,8 @@ const DashboardPage: React.FC = () => {
         />
       </div>
 
+      <div className="mb-2 mt-2 text-sm font-semibold text-slate-700">Intelligence Context</div>
+
       {/* All other widgets in a grid below the chart */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Cross-asset confirmation matrix */}
