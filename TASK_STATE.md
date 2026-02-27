@@ -16,6 +16,9 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **S0-002** Set backend `.env` for stable data-source behavior — **Owner: DAE**
 - [x] **S1-001** Start canonical schema file + API error envelope — **Owner: DAE**
 - [ ] **S1-002** Add basic health endpoint for service/data freshness — **Owner: DAE**
+- [x] **S1-003** Complete module value audit (info-first scoring + launch layout) — **Owner: PHR**
+- [x] **S1-004** Publish coding+commit plan for Sprint 1 (frontend info architecture) — **Owner: PHR**
+- [ ] **S1-005** Start Session 1 coding: add frontend intelligence contracts — **Owner: DAE**
 - [ ] **OPS-001** Merge PHR plan deltas into board as they arrive (no static freeze) — **Owner: DAE/PHR**
 
 ## NEXT (queued / this week)
