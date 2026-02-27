@@ -1,10 +1,10 @@
-import axios from 'axios';
 import { DataPoint, TimeSeriesPoint } from '../contracts/marketData';
+import { getWithRetry } from '../lib/httpClient';
 
 const FRED_API_KEY = process.env.FRED_API_KEY;
 const FRED_BASE_URL = 'https://api.stlouisfed.org/fred/series/observations';
-const HTTP_TIMEOUT_MS = Number(process.env.HTTP_TIMEOUT_MS || 8000);
 const PROVIDER_MODE = process.env.DATA_PROVIDER_MODE || 'live_with_fallback';
+const PROVIDER_CACHE_TTL_MS = Number(process.env.PROVIDER_CACHE_TTL_MS || 5 * 60 * 1000);
 
 const INDEX_SERIES = {
   SP500: 'SP500',
@@ -27,9 +27,18 @@ const MOCK_DATA: Record<string, DataPoint> = {
 type IndexKey = keyof typeof INDEX_SERIES;
 
 const indexHistoryCache: Record<string, { data: TimeSeriesPoint[]; lastFetched: number }> = {};
+const performanceCache: { data: Record<IndexKey, DataPoint & { change?: number; percentChange?: number }> | null; ts: number } = {
+  data: null,
+  ts: 0,
+};
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 export async function fetchIndexPerformance() {
+  const now = Date.now();
+  if (performanceCache.data && now - performanceCache.ts < PROVIDER_CACHE_TTL_MS) {
+    return { data: performanceCache.data, error: null, cached: true };
+  }
+
   try {
     const results: Record<IndexKey, DataPoint & { change?: number; percentChange?: number }> = {} as any;
     const useMockOnly = PROVIDER_MODE === 'mock_only' || !FRED_API_KEY;
@@ -45,8 +54,8 @@ export async function fetchIndexPerformance() {
       const url = `${FRED_BASE_URL}?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json&observation_end=${today}`;
 
       try {
-        const resp = await axios.get(url, { timeout: HTTP_TIMEOUT_MS });
-        const obsArr = resp.data.observations || [];
+        const resp = await getWithRetry(url);
+        const obsArr = (resp.data as any).observations || [];
         const n = obsArr.length;
 
         if (n > 1) {
@@ -89,9 +98,11 @@ export async function fetchIndexPerformance() {
       }
     }
 
-    return { data: results, error: null };
+    performanceCache.data = results;
+    performanceCache.ts = now;
+    return { data: results, error: null, cached: false };
   } catch (err: any) {
-    return { data: MOCK_DATA, error: err.message || 'API error, using mock data' };
+    return { data: MOCK_DATA as any, error: err.message || 'API error, using mock data', cached: false };
   }
 }
 
@@ -107,8 +118,8 @@ export async function fetchFredSeriesHistory(seriesId: string) {
 
   const url = `${FRED_BASE_URL}?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json`;
   try {
-    const resp = await axios.get(url, { timeout: HTTP_TIMEOUT_MS });
-    const obsArr = resp.data.observations || [];
+    const resp = await getWithRetry(url);
+    const obsArr = (resp.data as any).observations || [];
     const data: TimeSeriesPoint[] = obsArr
       .filter((obs: any) => obs.value !== '.')
       .map((obs: any) => ({

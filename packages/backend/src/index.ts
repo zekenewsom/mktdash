@@ -2,12 +2,14 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
 import apiRoutes from './routes/api';
+import { trackRequestMetrics } from './lib/requestMetrics';
 
 const app = express();
 const port = process.env.PORT || 3001; // Default to 3001 if PORT is not set
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+app.use(trackRequestMetrics);
 
 // Basic route for testing
 app.get('/', (req, res) => {

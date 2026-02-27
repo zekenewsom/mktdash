@@ -102,11 +102,45 @@ interface DataQualityPayload {
     fallback: boolean;
     quality_flags?: Record<string, boolean>;
   }>;
+  dataset_metrics?: {
+    freshness_ratio: number;      // 0..1
+    completeness_ratio: number;   // 0..1
+    drift: {
+      index_drift_count: number;
+      index_drift_flags: Array<{ symbol: string; percent_change?: number; drift: boolean }>;
+    };
+    calendar: {
+      event_count: number;
+      upcoming_count: number;
+      source_fallback_used: boolean;
+    };
+  };
   provider_errors: string[];
 }
 ```
 
-## 5) Calendar Event Contract (`/api/calendar/events`)
+## 5) Request Metrics Contract (`/api/health/metrics`)
+
+```ts
+interface RequestMetricsPayload {
+  generated_at: string;
+  metrics: {
+    window_minutes: number;
+    sample_count: number;
+    p50_ms: number;
+    p95_ms: number;
+    max_ms: number;
+    by_path: Record<string, {
+      count: number;
+      p50_ms: number;
+      p95_ms: number;
+      max_ms: number;
+    }>;
+  };
+}
+```
+
+## 6) Calendar Event Contract (`/api/calendar/events`)
 
 ```ts
 interface CalendarEvent {
@@ -120,7 +154,7 @@ interface CalendarEvent {
 }
 ```
 
-## 6) Runtime Validation
+## 7) Runtime Validation
 
 Contract validators are implemented in:
 - `packages/backend/src/lib/validators.ts`
@@ -132,7 +166,7 @@ Currently enforced at controller boundaries for:
 
 If validation fails, API returns `VALIDATION_ERROR` and includes payload in `data` for debugging.
 
-## 7) Error Codes (active)
+## 8) Error Codes (active)
 
 - `VALIDATION_ERROR` – malformed request or contract mismatch
 - `UPSTREAM_FRED_ERROR` – data provider failure

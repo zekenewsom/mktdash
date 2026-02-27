@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getMacroData, getMarketIndices, getIndexHistory, getSeriesHistory, getDataQuality, getBackendStatus } from '../controllers/dataController';
+import { getMacroData, getMarketIndices, getIndexHistory, getSeriesHistory, getDataQuality, getBackendStatus, getRequestMetrics } from '../controllers/dataController';
 import { generateDailyReport } from '../controllers/reportController';
 import { getIntelligenceOverview } from '../controllers/intelligenceController';
 import { getEconomicCalendar } from '../controllers/calendarController';
@@ -15,6 +15,7 @@ router.get('/market-indices/history', getIndexHistory);
 router.get('/history', getSeriesHistory);
 router.get('/intelligence/overview', getIntelligenceOverview);
 router.get('/health/status', getBackendStatus);
+router.get('/health/metrics', getRequestMetrics);
 router.get('/health/data-quality', getDataQuality);
 router.get('/calendar/events', getEconomicCalendar);
 

@@ -1,10 +1,10 @@
-import axios from 'axios';
 import { DataPoint } from '../contracts/marketData';
+import { getWithRetry } from '../lib/httpClient';
 
 const FRED_API_KEY = process.env.FRED_API_KEY;
 const FRED_BASE_URL = 'https://api.stlouisfed.org/fred/series/observations';
-const HTTP_TIMEOUT_MS = Number(process.env.HTTP_TIMEOUT_MS || 8000);
 const PROVIDER_MODE = process.env.DATA_PROVIDER_MODE || 'live_with_fallback';
+const PROVIDER_CACHE_TTL_MS = Number(process.env.PROVIDER_CACHE_TTL_MS || 5 * 60 * 1000);
 
 const MOCK_DATA: Record<string, DataPoint> = {
   FEDFUNDS: { symbol: 'FEDFUNDS', source: 'mock', value: 5.33, as_of: '2025-05-01', unit: '%' },
@@ -12,8 +12,16 @@ const MOCK_DATA: Record<string, DataPoint> = {
   UNRATE: { symbol: 'UNRATE', source: 'mock', value: 3.8, as_of: '2025-04-01', unit: '%' },
 };
 
+const macroCache: Record<string, { data: Record<string, DataPoint>; ts: number }> = {};
+
 export async function fetchMacroData(seriesIds: string[]) {
   const useMockOnly = PROVIDER_MODE === 'mock_only' || !FRED_API_KEY;
+  const cacheKey = [...seriesIds].sort().join(',');
+  const now = Date.now();
+
+  if (macroCache[cacheKey] && now - macroCache[cacheKey].ts < PROVIDER_CACHE_TTL_MS) {
+    return { data: macroCache[cacheKey].data, error: null, cached: true };
+  }
 
   try {
     const results: Record<string, DataPoint> = {};
@@ -35,8 +43,8 @@ export async function fetchMacroData(seriesIds: string[]) {
       const url = `${FRED_BASE_URL}?series_id=${id}&api_key=${FRED_API_KEY}&file_type=json&observation_end=${today}`;
 
       try {
-        const resp = await axios.get(url, { timeout: HTTP_TIMEOUT_MS });
-        const obsArr = resp.data.observations || [];
+        const resp = await getWithRetry(url);
+        const obsArr = (resp.data as any).observations || [];
         const obs = obsArr.length > 0 ? obsArr[obsArr.length - 1] : undefined;
 
         if (obs && obs.value !== '.') {
@@ -71,8 +79,9 @@ export async function fetchMacroData(seriesIds: string[]) {
       }
     }
 
-    return { data: results, error: null };
+    macroCache[cacheKey] = { data: results, ts: now };
+    return { data: results, error: null, cached: false };
   } catch (err: any) {
-    return { data: MOCK_DATA, error: err.message || 'API error, using mock data' };
+    return { data: MOCK_DATA, error: err.message || 'API error, using mock data', cached: false };
   }
 }

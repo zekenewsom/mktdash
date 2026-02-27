@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { getWithRetry } from '../lib/httpClient';
 
 export interface CalendarEvent {
   id: string;
@@ -11,14 +11,20 @@ export interface CalendarEvent {
 }
 
 const FRED_API_KEY = process.env.FRED_API_KEY;
-const HTTP_TIMEOUT_MS = Number(process.env.HTTP_TIMEOUT_MS || 8000);
 const FRED_BASE = 'https://api.stlouisfed.org/fred';
+const CALENDAR_CACHE_TTL_MS = Number(process.env.CALENDAR_CACHE_TTL_MS || 60 * 60 * 1000);
 
 const SERIES_CALENDAR_MAP = [
   { seriesId: 'CPIAUCSL', title: 'US CPI Release', impact: 'high' as const, category: 'inflation' as const },
   { seriesId: 'UNRATE', title: 'US Unemployment Rate', impact: 'high' as const, category: 'labor' as const },
   { seriesId: 'FEDFUNDS', title: 'Fed Funds Rate Update', impact: 'high' as const, category: 'policy' as const },
 ];
+
+const calendarCache: { data: CalendarEvent[] | null; ts: number; error: string | null } = {
+  data: null,
+  ts: 0,
+  error: null,
+};
 
 function scaffoldEvents() {
   const now = Date.now();
@@ -44,13 +50,13 @@ function scaffoldEvents() {
     },
   ];
 
-  return { data: events, error: 'FRED calendar unavailable; using scaffold events' };
+  return { data: events, error: 'FRED calendar unavailable; using scaffold events', cached: false };
 }
 
 async function fetchReleaseIdForSeries(seriesId: string) {
   const url = `${FRED_BASE}/series/release?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json`;
-  const resp = await axios.get(url, { timeout: HTTP_TIMEOUT_MS });
-  return resp?.data?.releases?.[0]?.id as number | undefined;
+  const resp = await getWithRetry(url);
+  return (resp.data as any)?.releases?.[0]?.id as number | undefined;
 }
 
 async function fetchUpcomingReleaseDate(releaseId: number) {
@@ -58,8 +64,8 @@ async function fetchUpcomingReleaseDate(releaseId: number) {
   const end = new Date(Date.now() + 1000 * 60 * 60 * 24 * 14).toISOString().slice(0, 10);
 
   const url = `${FRED_BASE}/release/dates?release_id=${releaseId}&api_key=${FRED_API_KEY}&file_type=json&realtime_start=${today}&realtime_end=${end}&include_release_dates_with_no_data=true`;
-  const resp = await axios.get(url, { timeout: HTTP_TIMEOUT_MS });
-  const dates: Array<{ date: string }> = resp?.data?.release_dates || [];
+  const resp = await getWithRetry(url);
+  const dates: Array<{ date: string }> = (resp.data as any)?.release_dates || [];
   const sorted = dates
     .map((d) => d.date)
     .filter(Boolean)
@@ -68,6 +74,11 @@ async function fetchUpcomingReleaseDate(releaseId: number) {
 }
 
 export async function fetchEconomicCalendar() {
+  const now = Date.now();
+  if (calendarCache.data && now - calendarCache.ts < CALENDAR_CACHE_TTL_MS) {
+    return { data: calendarCache.data, error: calendarCache.error, cached: true };
+  }
+
   if (!FRED_API_KEY) {
     return scaffoldEvents();
   }
@@ -102,13 +113,20 @@ export async function fetchEconomicCalendar() {
     }
 
     events.sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at));
+    calendarCache.data = events;
+    calendarCache.ts = now;
+    calendarCache.error = null;
 
     return {
       data: events,
       error: null,
+      cached: false,
     };
   } catch (err: any) {
     const fallback = scaffoldEvents();
+    calendarCache.data = fallback.data;
+    calendarCache.ts = now;
+    calendarCache.error = err.message || fallback.error;
     return { ...fallback, error: err.message || fallback.error };
   }
 }

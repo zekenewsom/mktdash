@@ -12,19 +12,20 @@ Mode: Rolling Kanban (dynamic reprioritization)
 ---
 
 ## NOW (recalibrated next 72h)
-- [ ] **S3-001** Finish ingestion quality metrics (`T1-004`): freshness/completeness/drift for intelligence + calendar + quality datasets — **Owner: DAE**
-- [ ] **S3-002** Build idempotent replay/backfill job (`T1-007`) with 7-day window and deterministic keys — **Owner: DAE**
-- [ ] **S3-003** Author replay runbook (`T1-008`) with rollback/retry procedure — **Owner: PHR/DAE**
-- [ ] **S3-004** Validate deterministic replay counts (`T1-009`) with acceptance report — **Owner: DAE**
-- [ ] **S3-005** Add request timing + p95 telemetry (`T2-004`) and expose metrics endpoint — **Owner: DAE**
-- [ ] **S3-006** Add provider cache + timeout/retry policy (`T2-005`) for FRED/calendar — **Owner: DAE**
+- [x] **S3-001** Finish ingestion quality metrics (`T1-004`): freshness/completeness/drift for intelligence + calendar + quality datasets — **Owner: DAE**
+- [x] **S3-002** Build idempotent replay/backfill job (`T1-007`) with 7-day window and deterministic keys — **Owner: DAE**
+- [x] **S3-003** Author replay runbook (`T1-008`) with rollback/retry procedure — **Owner: PHR/DAE**
+- [x] **S3-004** Validate deterministic replay counts (`T1-009`) with acceptance report — **Owner: DAE**
+- [x] **S3-005** Add request timing + p95 telemetry (`T2-004`) and expose metrics endpoint — **Owner: DAE**
+- [x] **S3-006** Add provider cache + timeout/retry policy (`T2-005`) for FRED/calendar — **Owner: DAE**
 - [ ] **S3-007** Frontend resilience pass 1 (`T3-001`): standard loading/empty/error/offline states for all intelligence cards — **Owner: DAE**
+- [ ] **S3-008** Run replay/backfill validation in staging env with live provider keys and capture non-zero baseline report — **Owner: DAE**
 
 ## NEXT (queued / this week)
 - [x] **T1-001** Create canonical market data schemas (`symbol`, `source`, `as_of`, `value`, `unit`, `quality_flags`) — **Owner: DAE**
 - [x] **T1-002** Add schema versioning strategy + migration notes (`docs/data-contracts.md`) — **Owner: DAE**
 - [x] **T1-003** Wire validation into ingestion entrypoints — **Owner: DAE**
-- [ ] **T1-004** Add freshness/completeness/drift metrics per dataset — **Owner: DAE**
+- [x] **T1-004** Add freshness/completeness/drift metrics per dataset — **Owner: DAE**
 - [x] **T1-005** Expose `/api/health/data-quality` endpoint — **Owner: DAE**
 - [x] **T1-006** Add frontend quality panel placeholder — **Owner: DAE**
 
@@ -43,16 +44,16 @@ Mode: Rolling Kanban (dynamic reprioritization)
 ## BACKLOG (milestone-indexed)
 
 ### Phase 1 — Data Layer Hardening (W1–W2)
-- [ ] **T1-007** Implement idempotent replay job (7-day window) — **Owner: DAE**
-- [ ] **T1-008** Write runbook (`runbooks/backfill-replay.md`) — **Owner: PHR**
-- [ ] **T1-009** Validate deterministic replay counts ±0.1% — **Owner: DAE**
+- [x] **T1-007** Implement idempotent replay job (7-day window) — **Owner: DAE**
+- [x] **T1-008** Write runbook (`runbooks/backfill-replay.md`) — **Owner: PHR**
+- [x] **T1-009** Validate deterministic replay counts ±0.1% — **Owner: DAE**
 
 ### Phase 2 — Backend/API Quality (W3–W4)
 - [ ] **T2-001** Define error envelope and API response shape — **Owner: DAE**
 - [ ] **T2-002** Generate OpenAPI spec for all existing routes — **Owner: DAE**
 - [ ] **T2-003** Publish docs endpoint/static artifact — **Owner: DAE**
-- [ ] **T2-004** Add request timing + p95 metrics — **Owner: DAE**
-- [ ] **T2-005** Add caching + timeout/retry policy by provider — **Owner: DAE**
+- [x] **T2-004** Add request timing + p95 metrics — **Owner: DAE**
+- [x] **T2-005** Add caching + timeout/retry policy by provider — **Owner: DAE**
 - [ ] **T2-006** Add rate limiting + abuse controls — **Owner: DAE**
 - [ ] **T2-007** Add load tests for top 5 endpoints — **Owner: DAE**
 - [ ] **T2-008** Add CI gate for latency/error thresholds — **Owner: DAE**
@@ -112,3 +113,4 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - **2026-02-27:** Vercel env + redeploy confirmed; frontend now points to Render backend URL.
 - **2026-02-27:** Key rotation confirmed complete by human.
 - **2026-02-27:** Plan recalibrated to prioritize ingestion hardening + observability before broader API/UX expansion.
+- **2026-02-27:** Completed ingestion hardening + observability tranche (`T1-004`, `T1-007..009`, `T2-004..005`), with staging replay validation queued.
