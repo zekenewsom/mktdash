@@ -6,7 +6,7 @@ export const getEconomicCalendar = async (_req: Request, res: Response) => {
   try {
     const result = await fetchEconomicCalendar();
     if (result.error) {
-      return sendError(res, 'UPSTREAM_CALENDAR_ERROR', result.error, 500, undefined, result.data);
+      return sendError(res, 'UPSTREAM_CALENDAR_WARNING', result.error, 200, undefined, result.data);
     }
     return sendSuccess(res, result.data);
   } catch (err: any) {
