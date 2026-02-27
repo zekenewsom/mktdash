@@ -9,10 +9,29 @@ function toDirection(value: number | undefined): 'up' | 'down' | 'flat' {
   return 'flat';
 }
 
-function toConfidence(sources: string[], fallbackUsed: boolean): 'high' | 'medium' | 'low' {
-  if (fallbackUsed) return 'low';
+function toConfidence(sources: string[], fallbackUsed: boolean, staleUsed: boolean): 'high' | 'medium' | 'low' {
+  if (fallbackUsed || staleUsed) return 'low';
   if (sources.length >= 2) return 'high';
   return 'medium';
+}
+
+function ageDaysFromAsOf(asOf?: string | null): number | null {
+  if (!asOf) return null;
+  const ts = Date.parse(asOf);
+  if (Number.isNaN(ts)) return null;
+  return (Date.now() - ts) / (1000 * 60 * 60 * 24);
+}
+
+function withStaleFlag(dataPoint: any, maxAgeDays: number) {
+  const ageDays = ageDaysFromAsOf(dataPoint?.as_of);
+  const isStale = ageDays != null ? ageDays > maxAgeDays : false;
+  return {
+    ...dataPoint,
+    quality_flags: {
+      ...(dataPoint?.quality_flags || {}),
+      ...(isStale ? { stale: true } : {}),
+    },
+  };
 }
 
 export async function fetchIntelligenceOverview() {
@@ -21,8 +40,20 @@ export async function fetchIntelligenceOverview() {
     fetchMacroData(['FEDFUNDS', 'CPIAUCSL', 'UNRATE']),
   ]);
 
-  const indices = indicesResult.data as any;
-  const macro = macroResult.data as any;
+  const indicesRaw = indicesResult.data as any;
+  const macroRaw = macroResult.data as any;
+
+  const indices = {
+    SP500: withStaleFlag(indicesRaw?.SP500, 3),
+    NASDAQCOM: withStaleFlag(indicesRaw?.NASDAQCOM, 3),
+    DJIA: withStaleFlag(indicesRaw?.DJIA, 3),
+  };
+
+  const macro = {
+    FEDFUNDS: withStaleFlag(macroRaw?.FEDFUNDS, 45),
+    CPIAUCSL: withStaleFlag(macroRaw?.CPIAUCSL, 60),
+    UNRATE: withStaleFlag(macroRaw?.UNRATE, 45),
+  };
 
   const spxChange = indices?.SP500?.percentChange ?? 0;
   const ndxChange = indices?.NASDAQCOM?.percentChange ?? 0;
@@ -62,8 +93,10 @@ export async function fetchIntelligenceOverview() {
     },
   ];
 
-  const fallbackUsed = [indices?.SP500, indices?.NASDAQCOM, indices?.DJIA, macro?.FEDFUNDS, macro?.CPIAUCSL, macro?.UNRATE]
-    .some((d: any) => Boolean(d?.quality_flags?.fallback || d?.source === 'mock'));
+  const mergedPoints = [indices?.SP500, indices?.NASDAQCOM, indices?.DJIA, macro?.FEDFUNDS, macro?.CPIAUCSL, macro?.UNRATE];
+
+  const fallbackUsed = mergedPoints.some((d: any) => Boolean(d?.quality_flags?.fallback || d?.source === 'mock'));
+  const staleUsed = mergedPoints.some((d: any) => Boolean(d?.quality_flags?.stale));
 
   const sources = Array.from(
     new Set(
@@ -72,7 +105,7 @@ export async function fetchIntelligenceOverview() {
     ),
   ) as string[];
 
-  const confidence = toConfidence(sources, fallbackUsed);
+  const confidence = toConfidence(sources, fallbackUsed, staleUsed);
   const asOf = new Date().toISOString();
 
   const regime: RegimeState = {
@@ -84,7 +117,10 @@ export async function fetchIntelligenceOverview() {
       as_of: asOf,
       source: sources.join('+') || 'unknown',
       confidence,
-      quality_flags: fallbackUsed ? { fallback: true } : undefined,
+      quality_flags: {
+        ...(fallbackUsed ? { fallback: true } : {}),
+        ...(staleUsed ? { stale: true } : {}),
+      },
     },
   };
 
@@ -132,6 +168,8 @@ export async function fetchIntelligenceOverview() {
       as_of: asOf,
       confidence,
       fallback_used: fallbackUsed,
+      stale_used: staleUsed,
+      stale_count: mergedPoints.filter((d: any) => Boolean(d?.quality_flags?.stale)).length,
       sources,
     },
   };

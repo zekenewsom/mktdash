@@ -27,8 +27,16 @@ const RegimeStateCard: React.FC<RegimeStateCardProps> = ({ regime }) => {
         </div>
       </div>
 
-      <div className="mt-3 text-sm text-muted-foreground">
-        Confidence: <span className="font-medium text-foreground capitalize">{regime.confidence}</span>
+      <div className="mt-3 text-sm text-muted-foreground flex flex-wrap items-center gap-2">
+        <span>
+          Confidence: <span className="font-medium text-foreground capitalize">{regime.confidence}</span>
+        </span>
+        {regime.quality.isFallback && (
+          <span className="text-xs px-2 py-0.5 rounded bg-yellow-100 text-yellow-800">fallback</span>
+        )}
+        {regime.quality.qualityFlags?.includes('stale') && (
+          <span className="text-xs px-2 py-0.5 rounded bg-orange-100 text-orange-800">stale</span>
+        )}
       </div>
 
       <div className="mt-4 space-y-2 text-sm">
@@ -43,7 +51,7 @@ const RegimeStateCard: React.FC<RegimeStateCardProps> = ({ regime }) => {
       </div>
 
       <p className="mt-4 text-xs text-muted-foreground">
-        as_of: {new Date(regime.quality.asOf).toLocaleString()}
+        source: {regime.quality.source} • as_of: {new Date(regime.quality.asOf).toLocaleString()}
       </p>
     </section>
   );

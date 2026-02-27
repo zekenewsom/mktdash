@@ -45,6 +45,8 @@ export interface IntelligenceOverview {
     as_of: string;
     confidence: ConfidenceLevel;
     fallback_used: boolean;
+    stale_used: boolean;
+    stale_count: number;
     sources: string[];
   };
 }
