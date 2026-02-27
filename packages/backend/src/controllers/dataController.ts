@@ -84,6 +84,18 @@ function isStale(symbol: string, ageMins: number | null) {
   return ageMins > threshold;
 }
 
+export const getBackendStatus = async (_req: Request, res: Response) => {
+  try {
+    return sendSuccess(res, {
+      status: 'ok',
+      uptime_seconds: Math.round(process.uptime()),
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    return sendError(res, 'INTERNAL_ERROR', err.message || 'Unknown error', 500);
+  }
+};
+
 export const getDataQuality = async (_req: Request, res: Response) => {
   try {
     const [indicesResult, macroResult] = await Promise.all([

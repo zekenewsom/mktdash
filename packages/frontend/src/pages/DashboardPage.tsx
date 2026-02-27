@@ -65,6 +65,7 @@ const DashboardPage: React.FC = () => {
   const [matrixRows, setMatrixRows] = React.useState<CrossAssetRow[]>([]);
   const [intelligenceLoading, setIntelligenceLoading] = React.useState(false);
   const [intelligenceError, setIntelligenceError] = React.useState<string | null>(null);
+  const [backendHeartbeat, setBackendHeartbeat] = React.useState<'ok' | 'degraded'>('degraded');
 
   React.useEffect(() => {
     setLoading(true);
@@ -79,6 +80,16 @@ const DashboardPage: React.FC = () => {
       })
       .finally(() => setLoading(false));
   }, [selectedSeries]);
+
+  React.useEffect(() => {
+    axios
+      .get('/api/health/status')
+      .then((res) => {
+        const status = res.data?.data?.status || res.data?.status;
+        setBackendHeartbeat(status === 'ok' ? 'ok' : 'degraded');
+      })
+      .catch(() => setBackendHeartbeat('degraded'));
+  }, []);
 
   React.useEffect(() => {
     setIntelligenceLoading(true);
@@ -140,6 +151,12 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4">
+      <div className="mb-3 text-xs">
+        <span className={`inline-flex items-center rounded px-2 py-1 ${backendHeartbeat === 'ok' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+          backend: {backendHeartbeat}
+        </span>
+      </div>
+
       {/* Tier-1 intelligence row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         {intelligenceLoading && (
