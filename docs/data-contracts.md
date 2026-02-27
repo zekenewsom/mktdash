@@ -1,12 +1,12 @@
-# mktdash Data Contracts (Draft)
+# mktdash Data Contracts
 
-## Canonical `DataPoint`
+## 1) Canonical `DataPoint`
 
 ```ts
 interface DataPoint {
   symbol: string;
   source: 'fred' | 'mock';
-  as_of: string | null; // ISO date
+  as_of: string | null; // ISO date/time
   value: number | null;
   unit: string;
   quality_flags?: {
@@ -18,7 +18,7 @@ interface DataPoint {
 }
 ```
 
-## Canonical API Envelope
+## 2) Canonical API Envelope
 
 ```ts
 interface ApiResponse<T> {
@@ -36,13 +36,106 @@ interface ApiResponse<T> {
 }
 ```
 
-## Error Codes (initial)
+## 3) Intelligence Overview Contract (`/api/intelligence/overview`)
 
-- `VALIDATION_ERROR` – malformed or missing request params
+```ts
+interface IntelligenceOverview {
+  regime: {
+    state: 'risk_on' | 'neutral' | 'risk_off';
+    score: number;
+    confidence: 'high' | 'medium' | 'low';
+    drivers: Array<{
+      key: string;
+      label: string;
+      direction: 'up' | 'down' | 'flat';
+      impact: 'positive' | 'negative' | 'neutral';
+    }>;
+    quality: {
+      as_of: string;
+      source: string;
+      confidence: 'high' | 'medium' | 'low';
+      quality_flags?: {
+        stale?: boolean;
+        fallback?: boolean;
+        missing?: boolean;
+        partial?: boolean;
+      };
+    };
+  };
+  changes: Array<{
+    id: string;
+    title: string;
+    detail: string;
+    category: 'growth' | 'inflation' | 'liquidity' | 'risk' | 'policy' | 'other';
+    direction: 'bullish' | 'bearish' | 'neutral';
+    as_of: string;
+    confidence: 'high' | 'medium' | 'low';
+    source: string;
+  }>;
+  quality: {
+    as_of: string;
+    confidence: 'high' | 'medium' | 'low';
+    fallback_used: boolean;
+    stale_used: boolean;
+    stale_count: number;
+    sources: string[];
+  };
+}
+```
+
+## 4) Data Quality Contract (`/api/health/data-quality`)
+
+```ts
+interface DataQualityPayload {
+  generated_at: string;
+  totals: {
+    metrics: number;
+    stale_count: number;
+    fallback_count: number;
+  };
+  records: Array<{
+    symbol: string;
+    source: string;
+    as_of: string | null;
+    age_mins: number | null;
+    stale: boolean;
+    fallback: boolean;
+    quality_flags?: Record<string, boolean>;
+  }>;
+  provider_errors: string[];
+}
+```
+
+## 5) Calendar Event Contract (`/api/calendar/events`)
+
+```ts
+interface CalendarEvent {
+  id: string;
+  title: string;
+  country: string;
+  impact: 'high' | 'medium' | 'low';
+  scheduled_at: string;
+  category: 'inflation' | 'labor' | 'growth' | 'policy' | 'other';
+  source: string;
+}
+```
+
+## 6) Runtime Validation
+
+Contract validators are implemented in:
+- `packages/backend/src/lib/validators.ts`
+
+Currently enforced at controller boundaries for:
+- intelligence overview payload
+- calendar events payload
+- data quality payload
+
+If validation fails, API returns `VALIDATION_ERROR` and includes payload in `data` for debugging.
+
+## 7) Error Codes (active)
+
+- `VALIDATION_ERROR` – malformed request or contract mismatch
 - `UPSTREAM_FRED_ERROR` – data provider failure
+- `UPSTREAM_DATA_WARNING` – partial intelligence due to provider issues
+- `UPSTREAM_CALENDAR_WARNING` – calendar fallback in use
 - `INTERNAL_ERROR` – unexpected internal exception
-
-## Compatibility Notes
-
-- Frontend currently reads `response.data.data || response.data`, so this envelope is backward-friendly.
-- `DATA_PROVIDER_MODE=mock_only` supports deterministic local development and demos.

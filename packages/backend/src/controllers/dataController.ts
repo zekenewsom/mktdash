@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { fetchMacroData } from '../services/fredService';
 import { fetchIndexPerformance, fetchIndexHistory, fetchFredSeriesHistory } from '../services/marketDataService';
 import { sendError, sendSuccess } from '../lib/apiResponse';
+import { validateDataQualityPayload } from '../lib/validators';
 
 export const getMacroData = async (_req: Request, res: Response) => {
   const seriesIds = ['FEDFUNDS', 'CPIAUCSL', 'UNRATE'];
@@ -126,7 +127,7 @@ export const getDataQuality = async (_req: Request, res: Response) => {
     const stale_count = records.filter((r) => r.stale).length;
     const fallback_count = records.filter((r) => r.fallback).length;
 
-    return sendSuccess(res, {
+    const payload = {
       generated_at: new Date().toISOString(),
       totals: {
         metrics: records.length,
@@ -135,7 +136,13 @@ export const getDataQuality = async (_req: Request, res: Response) => {
       },
       records,
       provider_errors: [indicesResult.error, macroResult.error].filter(Boolean),
-    });
+    };
+
+    if (!validateDataQualityPayload(payload)) {
+      return sendError(res, 'VALIDATION_ERROR', 'Data quality payload failed contract validation', 500, undefined, payload);
+    }
+
+    return sendSuccess(res, payload);
   } catch (err: any) {
     return sendError(res, 'INTERNAL_ERROR', err.message || 'Unknown error', 500);
   }

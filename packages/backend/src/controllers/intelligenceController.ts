@@ -1,10 +1,16 @@
 import { Request, Response } from 'express';
 import { sendError, sendSuccess } from '../lib/apiResponse';
 import { fetchIntelligenceOverview } from '../services/intelligenceService';
+import { validateIntelligenceOverview } from '../lib/validators';
 
 export const getIntelligenceOverview = async (_req: Request, res: Response) => {
   try {
     const result = await fetchIntelligenceOverview();
+
+    if (!validateIntelligenceOverview(result.data)) {
+      return sendError(res, 'VALIDATION_ERROR', 'Intelligence payload failed contract validation', 500, undefined, result.data);
+    }
+
     if (result.error) {
       return sendError(res, 'UPSTREAM_DATA_WARNING', result.error, 200, undefined, result.data);
     }

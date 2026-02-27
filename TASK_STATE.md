@@ -37,9 +37,9 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **S2-011** Sprint 2: promote calendar and quality modules into a dedicated intelligence row layout — **Owner: DAE**
 
 ## NEXT (queued / this week)
-- [ ] **T1-001** Create canonical market data schemas (`symbol`, `source`, `as_of`, `value`, `unit`, `quality_flags`) — **Owner: DAE**
-- [ ] **T1-002** Add schema versioning strategy + migration notes (`docs/data-contracts.md`) — **Owner: DAE**
-- [ ] **T1-003** Wire validation into ingestion entrypoints — **Owner: DAE**
+- [x] **T1-001** Create canonical market data schemas (`symbol`, `source`, `as_of`, `value`, `unit`, `quality_flags`) — **Owner: DAE**
+- [x] **T1-002** Add schema versioning strategy + migration notes (`docs/data-contracts.md`) — **Owner: DAE**
+- [x] **T1-003** Wire validation into ingestion entrypoints — **Owner: DAE**
 - [ ] **T1-004** Add freshness/completeness/drift metrics per dataset — **Owner: DAE**
 - [x] **T1-005** Expose `/api/health/data-quality` endpoint — **Owner: DAE**
 - [x] **T1-006** Add frontend quality panel placeholder — **Owner: DAE**
