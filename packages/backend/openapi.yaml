@@ -1,0 +1,72 @@
+openapi: 3.0.3
+info:
+  title: mktdash Backend API
+  version: 0.1.0
+  description: Core staging API for mktdash intelligence dashboard.
+servers:
+  - url: https://mktdash-backend-staging.onrender.com
+  - url: http://localhost:3001
+paths:
+  /api/health/status:
+    get:
+      summary: Backend heartbeat status
+      responses:
+        '200':
+          description: OK
+  /api/health/metrics:
+    get:
+      summary: Request timing metrics (15m window)
+      responses:
+        '200':
+          description: OK
+  /api/health/data-quality:
+    get:
+      summary: Data quality telemetry with freshness/completeness/drift
+      responses:
+        '200':
+          description: OK
+  /api/intelligence/overview:
+    get:
+      summary: Regime and material change overview
+      responses:
+        '200':
+          description: OK
+  /api/calendar/events:
+    get:
+      summary: Upcoming economic events
+      responses:
+        '200':
+          description: OK
+  /api/market-indices:
+    get:
+      summary: Current index snapshot
+      responses:
+        '200':
+          description: OK
+  /api/history:
+    get:
+      summary: Series history
+      parameters:
+        - in: query
+          name: series
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Validation error
+  /api/macro:
+    get:
+      summary: Macro snapshot (Fed funds, CPI, unemployment)
+      responses:
+        '200':
+          description: OK
+  /api/docs/openapi:
+    get:
+      summary: OpenAPI artifact (YAML)
+      responses:
+        '200':
+          description: YAML document
+components: {}

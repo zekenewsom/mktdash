@@ -20,7 +20,9 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **S3-006** Add provider cache + timeout/retry policy (`T2-005`) for FRED/calendar — **Owner: DAE**
 - [x] **S3-007** Frontend resilience pass 1 (`T3-001`): standard loading/empty/error/offline states for all intelligence cards — **Owner: DAE**
 - [ ] **S3-008** Run replay/backfill validation in staging env with live provider keys and capture non-zero baseline report — **Owner: DAE**
-- [ ] **S3-009** Staging smoke-test new observability endpoints (`/api/health/metrics`, enhanced `/api/health/data-quality`) after deploy — **Owner: DAE**
+- [x] **S3-009** Staging smoke-test new observability endpoints (`/api/health/metrics`, enhanced `/api/health/data-quality`) after deploy — **Owner: DAE**
+- [x] **S3-010** API quality pass: generate OpenAPI spec for live routes (`T2-002`) — **Owner: DAE**
+- [x] **S3-011** API quality pass: publish docs artifact endpoint (`T2-003`) — **Owner: DAE**
 
 ## NEXT (queued / this week)
 - [x] **T1-001** Create canonical market data schemas (`symbol`, `source`, `as_of`, `value`, `unit`, `quality_flags`) — **Owner: DAE**
@@ -50,9 +52,9 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **T1-009** Validate deterministic replay counts ±0.1% — **Owner: DAE**
 
 ### Phase 2 — Backend/API Quality (W3–W4)
-- [ ] **T2-001** Define error envelope and API response shape — **Owner: DAE**
-- [ ] **T2-002** Generate OpenAPI spec for all existing routes — **Owner: DAE**
-- [ ] **T2-003** Publish docs endpoint/static artifact — **Owner: DAE**
+- [x] **T2-001** Define error envelope and API response shape — **Owner: DAE**
+- [x] **T2-002** Generate OpenAPI spec for all existing routes — **Owner: DAE**
+- [x] **T2-003** Publish docs endpoint/static artifact — **Owner: DAE**
 - [x] **T2-004** Add request timing + p95 metrics — **Owner: DAE**
 - [x] **T2-005** Add caching + timeout/retry policy by provider — **Owner: DAE**
 - [ ] **T2-006** Add rate limiting + abuse controls — **Owner: DAE**
@@ -115,3 +117,4 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - **2026-02-27:** Key rotation confirmed complete by human.
 - **2026-02-27:** Plan recalibrated to prioritize ingestion hardening + observability before broader API/UX expansion.
 - **2026-02-27:** Completed ingestion hardening + observability tranche (`T1-004`, `T1-007..009`, `T2-004..005`), with staging replay validation queued.
+- **2026-02-27:** Completed API docs tranche (`T2-002`, `T2-003`) with `openapi.yaml` artifact and `/api/docs/openapi` endpoint.

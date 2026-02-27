@@ -3,6 +3,7 @@ import { getMacroData, getMarketIndices, getIndexHistory, getSeriesHistory, getD
 import { generateDailyReport } from '../controllers/reportController';
 import { getIntelligenceOverview } from '../controllers/intelligenceController';
 import { getEconomicCalendar } from '../controllers/calendarController';
+import { getOpenApiSpec } from '../controllers/docsController';
 
 const router = Router();
 
@@ -18,6 +19,7 @@ router.get('/health/status', getBackendStatus);
 router.get('/health/metrics', getRequestMetrics);
 router.get('/health/data-quality', getDataQuality);
 router.get('/calendar/events', getEconomicCalendar);
+router.get('/docs/openapi', getOpenApiSpec);
 
 // Placeholder route to trigger daily report generation (can be called manually for testing)
 router.post('/report/generate', generateDailyReport);
