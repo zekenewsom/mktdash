@@ -1,0 +1,38 @@
+feature_id,sleeve,label,source,target_freq,sla_minutes,weight_base,status
+SPX_RET_1D,equities,SP500 1d return,FRED,1d,1440,0.08,active
+NDX_RET_1D,equities,NASDAQ 1d return,FRED,1d,1440,0.06,active
+DJI_RET_1D,equities,Dow 1d return,FRED,1d,1440,0.05,active
+EQ_MOM_5D,equities,Equity momentum 5d,FRED,1d,1440,0.05,planned
+EQ_VOL_20D,equities,SPX 20d realized vol,FRED,1d,1440,0.04,planned
+BREADTH_PROXY,equities,Breadth proxy,FRED,1d,1440,0.04,planned
+DRAW_63D,equities,Drawdown 63d,FRED,1d,1440,0.03,planned
+LEADERSHIP_NDX_SPX,equities,NDX vs SPX leadership,FRED,1d,1440,0.03,planned
+UST2Y,rates,US 2Y yield,FRED,1d,1440,0.05,active
+UST10Y,rates,US 10Y yield,FRED,1d,1440,0.06,active
+CURVE_2S10S,rates,2s10s slope,FRED,1d,1440,0.05,active
+REAL_YIELD_PROXY,rates,Real yield proxy,FRED,1d,1440,0.04,planned
+RATES_MOM_5D,rates,Rates momentum 5d,FRED,1d,1440,0.03,planned
+MOVE_PROXY,rates,Rates vol proxy,FRED,1d,1440,0.03,planned
+POLICY_GAP,rates,Policy stance gap,FRED,1d,1440,0.04,active
+DXY,fx,Dollar index,FRED,1d,1440,0.05,active
+EURUSD,fx,EURUSD,FRED,1d,1440,0.03,active
+USDJPY,fx,USDJPY,Stooq,1d,1440,0.03,planned
+FX_MOM_5D,fx,FX momentum basket,FRED/Stooq,1d,1440,0.03,planned
+FX_VOL_PROXY,fx,FX volatility proxy,FRED,1d,1440,0.02,planned
+HY_OAS,credit,High yield OAS,FRED,1d,1440,0.06,active
+IG_OAS,credit,Investment grade OAS,FRED,1d,1440,0.05,planned
+HY_IG_DIFF,credit,HY-IG differential,FRED,1d,1440,0.04,planned
+CREDIT_MOM,credit,Credit spread momentum,FRED,1d,1440,0.03,planned
+CREDIT_EQ_DIVERGENCE,credit,Credit-equity divergence,FRED,1d,1440,0.03,planned
+VIX,volatility,VIX close,FRED,1d,1440,0.05,active
+VOL_TERM_PROXY,volatility,Vol term structure proxy,FRED,1d,1440,0.03,planned
+VOL_REGIME,volatility,Vol regime persistence,FRED,1d,1440,0.03,planned
+TAIL_PROXY,volatility,Tail risk proxy,FRED,1d,1440,0.03,planned
+WTI,commodities,WTI crude,FRED,1d,1440,0.04,active
+BRENT,commodities,Brent crude,Stooq,1d,1440,0.03,planned
+GOLD,commodities,Gold price,FRED,1d,1440,0.04,active
+COPPER,commodities,Copper price,Stooq,1d,1440,0.03,planned
+CPI_LEVEL,macro,CPIAUCSL,FRED,1mo,43200,0.03,active
+UNRATE_LEVEL,macro,Unemployment rate,FRED,1mo,43200,0.03,active
+FEDFUNDS_LEVEL,macro,Fed funds,FRED,1mo,43200,0.04,active
+CALENDAR_RISK_DENSITY,macro,7-day event risk density,Internal,1h,60,0.02,active
