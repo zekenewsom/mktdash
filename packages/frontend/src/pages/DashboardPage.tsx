@@ -6,6 +6,7 @@ import RegimeStateCard from '../components/intelligence/RegimeStateCard';
 import WhatChangedPanel from '../components/intelligence/WhatChangedPanel';
 import InvalidationPanel from '../components/intelligence/InvalidationPanel';
 import HeadlineIntelligenceFeed from '../components/intelligence/HeadlineIntelligenceFeed';
+import MarketMetricsPanel from '../components/intelligence/MarketMetricsPanel';
 import DataQualityConsole from '../components/intelligence/DataQualityConsole';
 import EconomicCalendar from '../components/intelligence/EconomicCalendar';
 import CrossAssetConfirmationMatrix, { CrossAssetRow } from '../components/intelligence/CrossAssetConfirmationMatrix';
@@ -88,7 +89,11 @@ const DashboardPage: React.FC = () => {
     apiClient
       .get(`/api/history?series=${selectedSeries}`)
       .then((res) => {
-        setSeriesHistory(res.data.data || res.data);
+        const rows = (res.data.data || res.data || []).map((r: any) => ({
+          date: r.date || r.as_of,
+          value: r.value,
+        }));
+        setSeriesHistory(rows);
       })
       .catch((err) => {
         setError(err.message || 'Failed to load history');
@@ -248,6 +253,9 @@ const DashboardPage: React.FC = () => {
         </div>
         <div className="lg:col-span-1">
           <DataQualityConsole />
+        </div>
+        <div className="lg:col-span-3">
+          <MarketMetricsPanel />
         </div>
         <div className="lg:col-span-3">
           <HeadlineIntelligenceFeed />

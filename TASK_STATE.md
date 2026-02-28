@@ -16,6 +16,8 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **S4-001** Regime v2 rollout: weighted factor scoring in intelligence overview — **Owner: DAE**
 - [x] **S4-002** Add Invalidation Trigger Panel end-to-end (API + UI) — **Owner: DAE**
 - [x] **S4-003** Add Headline Intelligence Feed with source corroboration counts — **Owner: DAE**
+- [x] **S4-004** Expand market metrics panel from 6 to 12+ institutional metrics and wire endpoint — **Owner: DAE**
+- [x] **S4-005** Fix chart rendering contract mismatch (`as_of` -> `date`) in dashboard history mapping — **Owner: DAE**
 - [x] **S3-002** Build idempotent replay/backfill job (`T1-007`) with 7-day window and deterministic keys — **Owner: DAE**
 - [x] **S3-003** Author replay runbook (`T1-008`) with rollback/retry procedure — **Owner: PHR/DAE**
 - [x] **S3-004** Validate deterministic replay counts (`T1-009`) with acceptance report — **Owner: DAE**
@@ -129,3 +131,4 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - **2026-02-27:** Added CI workflow with local latency/error gate and implemented frontend error boundary (`T2-008`, `T3-002`).
 - **2026-02-27:** Completed rate-limit policy tuning + mobile responsiveness + quick accessibility audit (`S3-013`, `T3-003`, `T3-004`).
 - **2026-02-27:** Institutional spec approved by human; executed next sprint: regime v2 + invalidation panel + headline corroboration feed.
+- **2026-02-27:** Expanded core metrics coverage (12+) and fixed chart data contract mismatch causing blank chart states.

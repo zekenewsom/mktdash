@@ -114,7 +114,7 @@ export const getDataQuality = async (_req: Request, res: Response) => {
   try {
     const [indicesResult, macroResult, calendarResult] = await Promise.all([
       fetchIndexPerformance(),
-      fetchMacroData(['FEDFUNDS', 'CPIAUCSL', 'UNRATE']),
+      fetchMacroData(['FEDFUNDS', 'CPIAUCSL', 'UNRATE', 'DGS10', 'DGS2', 'T10Y2Y', 'VIXCLS', 'DTWEXBGS', 'DCOILWTICO', 'GOLDAMGBD228NLBM']),
       fetchEconomicCalendar(),
     ]);
 
