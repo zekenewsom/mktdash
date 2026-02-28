@@ -28,7 +28,7 @@ const MarketMetricsPanel: React.FC = () => {
   React.useEffect(() => {
     setLoading(true);
     apiClient.get('/api/intelligence/metrics')
-      .then((res) => setMetrics(res.data?.data || {}))
+      .then((res) => setMetrics(res.data?.data?.metrics || {}))
       .catch((err) => setError(err.message || 'Failed to load metrics'))
       .finally(() => setLoading(false));
   }, []);

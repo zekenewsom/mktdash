@@ -22,8 +22,9 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **V2-007** Execute A1–A6 (Signal Foundation) from `docs/ARCHITECTURE_V2_TASK_BREAKDOWN.md` — **Owner: DAE**
 - [x] **V2-008** Execute A7–A12 (Thesis Engine v1) — **Owner: DAE/HEAVY**
 - [ ] **V2-009** Execute A13–A18 (Weighting + Quality Intelligence) — **Owner: DAE**
-- [ ] **V2-011** Expand live metric universe from ~12 to 30+ active feeds and map sleeves to effective weights — **Owner: DAE/SOPHIA**
-- [ ] **V2-012** Persist thesis history to artifacts store with replayable snapshots and add `/api/thesis/history` integrity checks — **Owner: DAE**
+- [x] **V2-011** Expand live metric universe from ~12 to 30+ active feeds and map sleeves to effective weights — **Owner: DAE/SOPHIA**
+- [x] **V2-012** Persist thesis history to artifacts store with replayable snapshots and add `/api/thesis/history` integrity checks — **Owner: DAE**
+- [ ] **V2-013** Add sleeve-level weighted contribution stats to frontend attribution panel — **Owner: DAE**
 - [ ] **V2-010** Execute A19–A24 (Governance + Drift Ops) — **Owner: DAE/ARGUS**
 - [x] **S4-001** Regime v2 rollout: weighted factor scoring in intelligence overview — **Owner: DAE**
 - [x] **S4-002** Add Invalidation Trigger Panel end-to-end (API + UI) — **Owner: DAE**
@@ -149,3 +150,4 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - **2026-02-28:** Added V2 signal/thesis endpoints and frontend thesis+attribution panels (`/api/signals/*`, `/api/thesis/*`).
 - **2026-02-28:** Added drift status endpoint and degraded-mode confidence cap wiring (`/api/health/drift`, capped regime confidence).
 - **2026-02-28:** Upgraded thesis engine with evidence model + persisted history and expanded metric universe target to 30+.
+- **2026-02-28:** Implemented feature registry-backed effective weights and thesis history integrity checks (`checksum`) for replay confidence.

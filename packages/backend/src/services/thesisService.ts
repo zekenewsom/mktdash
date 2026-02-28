@@ -26,6 +26,7 @@ const history: ThesisSnapshot[] = [];
 const HISTORY_MAX = 300;
 const historyDir = path.resolve(process.cwd(), 'artifacts/thesis');
 const historyFile = path.join(historyDir, 'history.jsonl');
+const checksumFile = path.join(historyDir, 'history.checksum.json');
 
 function loadHistory() {
   try {
@@ -43,6 +44,10 @@ function loadHistory() {
 function appendHistory(snapshot: ThesisSnapshot) {
   fs.mkdirSync(historyDir, { recursive: true });
   fs.appendFileSync(historyFile, `${JSON.stringify(snapshot)}\n`, 'utf8');
+
+  const payload = JSON.stringify({ count: history.length, latest_as_of: snapshot.as_of });
+  const checksum = Buffer.from(payload).toString('base64');
+  fs.writeFileSync(checksumFile, JSON.stringify({ checksum, updated_at: new Date().toISOString() }), 'utf8');
 }
 
 loadHistory();
@@ -138,12 +143,23 @@ export async function buildCurrentThesis() {
 }
 
 export function getThesisHistory() {
+  let checksum = null;
+  if (fs.existsSync(checksumFile)) {
+    try {
+      checksum = JSON.parse(fs.readFileSync(checksumFile, 'utf8'));
+    } catch {}
+  }
+
   return {
     data: {
       count: history.length,
       items: history,
       persisted: fs.existsSync(historyFile),
       file: historyFile,
+      integrity: {
+        checksum_present: Boolean(checksum),
+        checksum,
+      },
     },
     error: null,
   };

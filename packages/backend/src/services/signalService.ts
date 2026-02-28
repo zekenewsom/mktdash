@@ -1,39 +1,73 @@
 import { fetchIntelligenceMetrics } from './signalSources';
 import { fetchIntelligenceOverview } from './intelligenceService';
 import { assessDriftState } from './driftService';
+import { FEATURE_REGISTRY } from '../config/featureRegistry';
+
+function ageMinutes(asOf?: string | null) {
+  if (!asOf) return null;
+  const ts = Date.parse(asOf);
+  if (Number.isNaN(ts)) return null;
+  return Math.round((Date.now() - ts) / (1000 * 60));
+}
 
 export async function buildSignalFeatures() {
   const metricsResult = await fetchIntelligenceMetrics();
   const metrics = metricsResult.data || {};
 
-  const features = [
-    { feature_id: 'UST10Y', sleeve: 'rates', value: metrics.DGS10?.value ?? null, as_of: metrics.DGS10?.as_of ?? null, source: metrics.DGS10?.source ?? 'unknown' },
-    { feature_id: 'UST2Y', sleeve: 'rates', value: metrics.DGS2?.value ?? null, as_of: metrics.DGS2?.as_of ?? null, source: metrics.DGS2?.source ?? 'unknown' },
-    { feature_id: 'CURVE_2S10S', sleeve: 'rates', value: metrics.T10Y2Y?.value ?? null, as_of: metrics.T10Y2Y?.as_of ?? null, source: metrics.T10Y2Y?.source ?? 'unknown' },
-    { feature_id: 'DXY', sleeve: 'fx', value: metrics.DTWEXBGS?.value ?? null, as_of: metrics.DTWEXBGS?.as_of ?? null, source: metrics.DTWEXBGS?.source ?? 'unknown' },
-    { feature_id: 'EURUSD', sleeve: 'fx', value: metrics.DEXUSEU?.value ?? null, as_of: metrics.DEXUSEU?.as_of ?? null, source: metrics.DEXUSEU?.source ?? 'unknown' },
-    { feature_id: 'WTI', sleeve: 'commodities', value: metrics.DCOILWTICO?.value ?? null, as_of: metrics.DCOILWTICO?.as_of ?? null, source: metrics.DCOILWTICO?.source ?? 'unknown' },
-    { feature_id: 'GOLD', sleeve: 'commodities', value: metrics.GOLDAMGBD228NLBM?.value ?? null, as_of: metrics.GOLDAMGBD228NLBM?.as_of ?? null, source: metrics.GOLDAMGBD228NLBM?.source ?? 'unknown' },
-    { feature_id: 'VIX', sleeve: 'volatility', value: metrics.VIXCLS?.value ?? null, as_of: metrics.VIXCLS?.as_of ?? null, source: metrics.VIXCLS?.source ?? 'unknown' },
-    { feature_id: 'HY_OAS', sleeve: 'credit', value: metrics.BAMLH0A0HYM2?.value ?? null, as_of: metrics.BAMLH0A0HYM2?.as_of ?? null, source: metrics.BAMLH0A0HYM2?.source ?? 'unknown' },
-    { feature_id: 'FEDFUNDS', sleeve: 'macro', value: metrics.FEDFUNDS?.value ?? null, as_of: metrics.FEDFUNDS?.as_of ?? null, source: metrics.FEDFUNDS?.source ?? 'unknown' },
-    { feature_id: 'CPI', sleeve: 'macro', value: metrics.CPIAUCSL?.value ?? null, as_of: metrics.CPIAUCSL?.as_of ?? null, source: metrics.CPIAUCSL?.source ?? 'unknown' },
-    { feature_id: 'UNRATE', sleeve: 'macro', value: metrics.UNRATE?.value ?? null, as_of: metrics.UNRATE?.as_of ?? null, source: metrics.UNRATE?.source ?? 'unknown' },
-  ];
+  const snapshots = FEATURE_REGISTRY.map((spec) => {
+    const row = metrics[spec.symbol] || {};
+    const stale = typeof row?.as_of === 'string'
+      ? (ageMinutes(row.as_of) ?? Number.MAX_SAFE_INTEGER) > spec.sla_minutes * 2
+      : true;
+    const fallback = Boolean(row?.quality_flags?.fallback || row?.source === 'mock');
+
+    const qualityFactor = fallback ? 0.4 : stale ? 0.7 : 1;
+    const effective_weight = Number((spec.weight_base * qualityFactor).toFixed(4));
+
+    return {
+      feature_id: spec.feature_id,
+      symbol: spec.symbol,
+      sleeve: spec.sleeve,
+      label: spec.label,
+      value: row?.value ?? null,
+      as_of: row?.as_of ?? null,
+      source: row?.source ?? 'unknown',
+      stale,
+      fallback,
+      weight_base: spec.weight_base,
+      effective_weight,
+    };
+  });
 
   return {
     data: {
       as_of: new Date().toISOString(),
-      feature_count: features.length,
-      features,
+      feature_count: snapshots.length,
+      sleeves: Array.from(new Set(snapshots.map((s) => s.sleeve))),
+      features: snapshots,
     },
     error: metricsResult.error,
   };
 }
 
 export async function buildSignalRegime() {
-  const [overview, drift] = await Promise.all([fetchIntelligenceOverview(), assessDriftState()]);
+  const [overview, drift, featureSnapshot] = await Promise.all([
+    fetchIntelligenceOverview(),
+    assessDriftState(),
+    buildSignalFeatures(),
+  ]);
+
   const regime = overview.data.regime;
+  const features = featureSnapshot.data.features;
+
+  const sleeveStrength = {
+    rates: features.filter((f) => f.sleeve === 'rates').reduce((a, b) => a + b.effective_weight, 0),
+    fx: features.filter((f) => f.sleeve === 'fx').reduce((a, b) => a + b.effective_weight, 0),
+    credit: features.filter((f) => f.sleeve === 'credit').reduce((a, b) => a + b.effective_weight, 0),
+    volatility: features.filter((f) => f.sleeve === 'volatility').reduce((a, b) => a + b.effective_weight, 0),
+    commodities: features.filter((f) => f.sleeve === 'commodities').reduce((a, b) => a + b.effective_weight, 0),
+    macro: features.filter((f) => f.sleeve === 'macro').reduce((a, b) => a + b.effective_weight, 0),
+  };
 
   const dimensions = {
     growth_impulse: regime.state === 'risk_on' ? 0.35 : regime.state === 'risk_off' ? -0.35 : 0,
@@ -59,10 +93,12 @@ export async function buildSignalRegime() {
         confidence_raw: rawConfidence,
         confidence_capped_by_drift: drift.data.confidence_cap !== 'high',
         dimensions,
+        sleeve_strength: sleeveStrength,
+        feature_count: features.length,
         top_5_contributors: regime.drivers.slice(0, 5),
       },
       drift: drift.data,
     },
-    error: overview.error || drift.error,
+    error: overview.error || drift.error || featureSnapshot.error,
   };
 }

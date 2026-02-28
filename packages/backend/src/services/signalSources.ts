@@ -1,6 +1,6 @@
 import { fetchMacroData } from './fredService';
 
-const METRIC_SERIES = [
+export const METRIC_SERIES = [
   // Policy + macro
   'FEDFUNDS', 'DFF', 'SOFR',
   'CPIAUCSL', 'CPILFESL', 'PCEPI', 'PCEPILFE',
