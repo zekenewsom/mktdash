@@ -12,6 +12,7 @@ import ContributorAttributionPanel from '../components/intelligence/ContributorA
 import DataQualityConsole from '../components/intelligence/DataQualityConsole';
 import EconomicCalendar from '../components/intelligence/EconomicCalendar';
 import CrossAssetConfirmationMatrix, { CrossAssetRow } from '../components/intelligence/CrossAssetConfirmationMatrix';
+import QualityPanel from '../components/intelligence/QualityPanel';
 
 // This page component sets up the basic dashboard layout
 import apiClient from '../lib/apiClient';
@@ -255,6 +256,7 @@ const DashboardPage: React.FC = () => {
         </div>
         <div className="lg:col-span-1">
           <DataQualityConsole />
+          <QualityPanel />
         </div>
         <div className="lg:col-span-3">
           <MarketMetricsPanel />

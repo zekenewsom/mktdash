@@ -21,7 +21,7 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **V2-006** Add drift checks + degraded mode confidence cap — **Owner: DAE/ARGUS**
 - [x] **V2-007** Execute A1–A6 (Signal Foundation) from `docs/ARCHITECTURE_V2_TASK_BREAKDOWN.md` — **Owner: DAE**
 - [x] **V2-008** Execute A7–A12 (Thesis Engine v1) — **Owner: DAE/HEAVY**
-- [ ] **V2-009** Execute A13–A18 (Weighting + Quality Intelligence) — **Owner: DAE**
+- [x] **V2-009** Execute A13–A18 (Weighting + Quality Intelligence) — **Owner: DAE**
 - [x] **V2-011** Expand live metric universe from ~12 to 30+ active feeds and map sleeves to effective weights — **Owner: DAE/SOPHIA**
 - [x] **V2-012** Persist thesis history to artifacts store with replayable snapshots and add `/api/thesis/history` integrity checks — **Owner: DAE**
 - [ ] **V2-013** Add sleeve-level weighted contribution stats to frontend attribution panel — **Owner: DAE**

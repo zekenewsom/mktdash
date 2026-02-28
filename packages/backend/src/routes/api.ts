@@ -9,6 +9,7 @@ import { getIntelligenceMetrics } from '../controllers/metricsController';
 import { getSignalFeatures, getSignalRegime } from '../controllers/signalsController';
 import { getCurrentThesis, getThesisTimeline } from '../controllers/thesisController';
 import { getDriftStatus } from '../controllers/driftController';
+import { getQualityIntelligence } from '../controllers/qualityController';
 
 const router = Router();
 
@@ -23,6 +24,7 @@ router.get('/intelligence/overview', getIntelligenceOverview);
 router.get('/health/status', getBackendStatus);
 router.get('/health/metrics', getRequestMetrics);
 router.get('/health/drift', getDriftStatus);
+router.get('/intelligence/quality', getQualityIntelligence);
 router.get('/health/data-quality', getDataQuality);
 router.get('/calendar/events', getEconomicCalendar);
 router.get('/intelligence/headlines', getHeadlineIntelligence);
