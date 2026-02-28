@@ -37,6 +37,7 @@ Mode: Rolling Kanban (dynamic reprioritization)
 
 ## BLOCKED (waiting on decision/input)
 - [ ] **B-009** Confirm report-engine v1 scope before Phase 4 starts (`T4-001` format, sections, and output cadence) — **Owner: HUM**
+- [ ] **B-010** Approve `docs/v1-institutional-intelligence-spec.md` as canonical product target — **Owner: HUM**
 
 ## DONE
 - [x] **D-001** Initial 10-week robustness plan drafted by PHR
