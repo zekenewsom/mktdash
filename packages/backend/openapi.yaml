@@ -69,4 +69,10 @@ paths:
       responses:
         '200':
           description: YAML document
+  /api/report/generate:
+    post:
+      summary: Generate deterministic daily report payload (v1)
+      responses:
+        '200':
+          description: Report generated
 components: {}

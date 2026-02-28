@@ -41,7 +41,7 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **T1-006** Add frontend quality panel placeholder — **Owner: DAE**
 
 ## BLOCKED (waiting on decision/input)
-- [ ] **B-009** Confirm report-engine v1 scope before Phase 4 starts (`T4-001` format, sections, and output cadence) — **Owner: HUM**
+- [ ] **B-011** Confirm report delivery surface for v1 (`API JSON only` vs `PDF export in-app`) — **Owner: HUM**
 
 ## DONE
 - [x] **D-001** Initial 10-week robustness plan drafted by PHR
@@ -76,10 +76,10 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **T3-004** A11y quick audit (critical WCAG checks) — **Owner: DAE**
 
 ### Phase 4 — Report Engine Pipeline (W5–W6)
-- [ ] **T4-001** Define report template schema + input contract — **Owner: PHR/DAE**
-- [ ] **T4-002** Implement deterministic generation pipeline — **Owner: DAE**
+- [x] **T4-001** Define report template schema + input contract — **Owner: PHR/DAE**
+- [x] **T4-002** Implement deterministic generation pipeline — **Owner: DAE**
 - [ ] **T4-003** Add queue/retry/dead-letter flow — **Owner: DAE**
-- [ ] **T4-004** Add provenance metadata (`run_id`, `snapshot_id`, `code_sha`) — **Owner: DAE**
+- [x] **T4-004** Add provenance metadata (`run_id`, `snapshot_id`, `code_sha`) — **Owner: DAE**
 - [ ] **T4-005** Add golden tests for top report formats — **Owner: DAE**
 
 ### Phase 5 — CI/CD + Ops (W7–W8)
@@ -132,3 +132,4 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - **2026-02-27:** Completed rate-limit policy tuning + mobile responsiveness + quick accessibility audit (`S3-013`, `T3-003`, `T3-004`).
 - **2026-02-27:** Institutional spec approved by human; executed next sprint: regime v2 + invalidation panel + headline corroboration feed.
 - **2026-02-27:** Expanded core metrics coverage (12+) and fixed chart data contract mismatch causing blank chart states.
+- **2026-02-27:** Began Phase 4 execution with deterministic report engine v1 schema, generator, and provenance metadata endpoint integration.

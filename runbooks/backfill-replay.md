@@ -42,3 +42,7 @@ REPLAY_DAYS=14 corepack pnpm --filter backend backfill:validate
 ## Operational Notes
 - This replay is for robustness validation and historical consistency checks.
 - It does not mutate primary serving endpoints directly.
+
+## Related Report Engine Work
+- Report generation endpoint: `POST /api/report/generate`
+- Deterministic output includes provenance metadata (`run_id`, `snapshot_id`, `code_sha`).
