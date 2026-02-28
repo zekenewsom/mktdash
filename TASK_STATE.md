@@ -18,7 +18,7 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **V2-003** Implement thesis object schema + `/api/thesis/current` — **Owner: DAE/HEAVY**
 - [x] **V2-004** Add base/alt/invalidation probability panel in frontend — **Owner: DAE**
 - [x] **V2-005** Add contributor attribution panel (why regime score moved) — **Owner: DAE**
-- [ ] **V2-006** Add drift checks + degraded mode confidence cap — **Owner: DAE/ARGUS**
+- [x] **V2-006** Add drift checks + degraded mode confidence cap — **Owner: DAE/ARGUS**
 - [ ] **V2-007** Execute A1–A6 (Signal Foundation) from `docs/ARCHITECTURE_V2_TASK_BREAKDOWN.md` — **Owner: DAE**
 - [ ] **V2-008** Execute A7–A12 (Thesis Engine v1) — **Owner: DAE/HEAVY**
 - [ ] **V2-009** Execute A13–A18 (Weighting + Quality Intelligence) — **Owner: DAE**
@@ -145,3 +145,4 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - **2026-02-27:** Expanded core metrics coverage (12+) and fixed chart data contract mismatch causing blank chart states.
 - **2026-02-27:** Began Phase 4 execution with deterministic report engine v1 schema, generator, and provenance metadata endpoint integration.
 - **2026-02-28:** Added V2 signal/thesis endpoints and frontend thesis+attribution panels (`/api/signals/*`, `/api/thesis/*`).
+- **2026-02-28:** Added drift status endpoint and degraded-mode confidence cap wiring (`/api/health/drift`, capped regime confidence).

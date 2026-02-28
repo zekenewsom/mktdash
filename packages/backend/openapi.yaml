@@ -19,6 +19,12 @@ paths:
       responses:
         '200':
           description: OK
+  /api/health/drift:
+    get:
+      summary: Drift and degraded-mode status
+      responses:
+        '200':
+          description: OK
   /api/health/data-quality:
     get:
       summary: Data quality telemetry with freshness/completeness/drift

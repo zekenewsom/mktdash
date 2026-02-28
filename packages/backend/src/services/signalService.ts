@@ -1,5 +1,6 @@
 import { fetchIntelligenceMetrics } from './signalSources';
 import { fetchIntelligenceOverview } from './intelligenceService';
+import { assessDriftState } from './driftService';
 
 export async function buildSignalFeatures() {
   const metricsResult = await fetchIntelligenceMetrics();
@@ -31,7 +32,7 @@ export async function buildSignalFeatures() {
 }
 
 export async function buildSignalRegime() {
-  const overview = await fetchIntelligenceOverview();
+  const [overview, drift] = await Promise.all([fetchIntelligenceOverview(), assessDriftState()]);
   const regime = overview.data.regime;
 
   const dimensions = {
@@ -41,17 +42,27 @@ export async function buildSignalRegime() {
     risk_appetite: regime.state === 'risk_on' ? 0.5 : regime.state === 'risk_off' ? -0.5 : 0,
   };
 
+  const rawConfidence = regime.confidence;
+  const cappedConfidence = drift.data.confidence_cap === 'low'
+    ? 'low'
+    : drift.data.confidence_cap === 'medium' && rawConfidence === 'high'
+      ? 'medium'
+      : rawConfidence;
+
   return {
     data: {
       as_of: new Date().toISOString(),
       regime: {
         label: regime.state,
         score: regime.score,
-        confidence: regime.confidence,
+        confidence: cappedConfidence,
+        confidence_raw: rawConfidence,
+        confidence_capped_by_drift: drift.data.confidence_cap !== 'high',
         dimensions,
         top_5_contributors: regime.drivers.slice(0, 5),
       },
+      drift: drift.data,
     },
-    error: overview.error,
+    error: overview.error || drift.error,
   };
 }
