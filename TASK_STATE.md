@@ -13,6 +13,9 @@ Mode: Rolling Kanban (dynamic reprioritization)
 
 ## NOW (recalibrated next 72h)
 - [x] **S3-001** Finish ingestion quality metrics (`T1-004`): freshness/completeness/drift for intelligence + calendar + quality datasets — **Owner: DAE**
+- [x] **S4-001** Regime v2 rollout: weighted factor scoring in intelligence overview — **Owner: DAE**
+- [x] **S4-002** Add Invalidation Trigger Panel end-to-end (API + UI) — **Owner: DAE**
+- [x] **S4-003** Add Headline Intelligence Feed with source corroboration counts — **Owner: DAE**
 - [x] **S3-002** Build idempotent replay/backfill job (`T1-007`) with 7-day window and deterministic keys — **Owner: DAE**
 - [x] **S3-003** Author replay runbook (`T1-008`) with rollback/retry procedure — **Owner: PHR/DAE**
 - [x] **S3-004** Validate deterministic replay counts (`T1-009`) with acceptance report — **Owner: DAE**
@@ -37,7 +40,6 @@ Mode: Rolling Kanban (dynamic reprioritization)
 
 ## BLOCKED (waiting on decision/input)
 - [ ] **B-009** Confirm report-engine v1 scope before Phase 4 starts (`T4-001` format, sections, and output cadence) — **Owner: HUM**
-- [ ] **B-010** Approve `docs/v1-institutional-intelligence-spec.md` as canonical product target — **Owner: HUM**
 
 ## DONE
 - [x] **D-001** Initial 10-week robustness plan drafted by PHR
@@ -126,3 +128,4 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - **2026-02-27:** Applied CORS hotfix on backend to resolve cross-origin frontend network errors in Vercel->Render staging flow.
 - **2026-02-27:** Added CI workflow with local latency/error gate and implemented frontend error boundary (`T2-008`, `T3-002`).
 - **2026-02-27:** Completed rate-limit policy tuning + mobile responsiveness + quick accessibility audit (`S3-013`, `T3-003`, `T3-004`).
+- **2026-02-27:** Institutional spec approved by human; executed next sprint: regime v2 + invalidation panel + headline corroboration feed.

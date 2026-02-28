@@ -47,3 +47,13 @@ export interface InvalidationTrigger {
   asOf: string;
   confidence: ConfidenceLevel;
 }
+
+export interface HeadlineItem {
+  id: string;
+  title: string;
+  url: string;
+  sourceCount: number;
+  sources: string[];
+  asOf: string;
+  confidence: ConfidenceLevel;
+}

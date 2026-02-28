@@ -1,6 +1,6 @@
 import { fetchMacroData } from './fredService';
 import { fetchIndexPerformance } from './marketDataService';
-import { IntelligenceOverview, MaterialChange, RegimeDriver, RegimeState } from '../contracts/intelligence';
+import { IntelligenceOverview, InvalidationTrigger, MaterialChange, RegimeDriver, RegimeState } from '../contracts/intelligence';
 
 function toDirection(value: number | undefined): 'up' | 'down' | 'flat' {
   if (value == null) return 'flat';
@@ -34,6 +34,10 @@ function withStaleFlag(dataPoint: any, maxAgeDays: number) {
   };
 }
 
+function clamp(num: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, num));
+}
+
 export async function fetchIntelligenceOverview() {
   const [indicesResult, macroResult] = await Promise.all([
     fetchIndexPerformance(),
@@ -62,11 +66,28 @@ export async function fetchIntelligenceOverview() {
   const avgEquityChange = (spxChange + ndxChange + dowChange) / 3;
   const unrate = macro?.UNRATE?.value;
   const fedFunds = macro?.FEDFUNDS?.value;
+  const cpi = macro?.CPIAUCSL?.value;
 
-  let score = 50 + Math.max(-15, Math.min(15, avgEquityChange * 6));
-  if (typeof unrate === 'number' && unrate > 4.5) score -= 8;
-  if (typeof fedFunds === 'number' && fedFunds > 5) score -= 5;
-  score = Math.max(0, Math.min(100, Math.round(score)));
+  // Regime v2 weighted scoring (institutional-style weighted factors)
+  const weights = {
+    equities: 0.5,
+    policy: 0.25,
+    labor: 0.15,
+    inflation: 0.1,
+  };
+
+  const equitiesScore = clamp(avgEquityChange * 8, -20, 20);
+  const policyScore = typeof fedFunds === 'number' ? clamp((4.5 - fedFunds) * 6, -15, 15) : 0;
+  const laborScore = typeof unrate === 'number' ? clamp((4.4 - unrate) * 5, -10, 10) : 0;
+  const inflationScore = typeof cpi === 'number' ? clamp((320 - cpi) / 3, -8, 8) : 0;
+
+  const weighted =
+    equitiesScore * weights.equities +
+    policyScore * weights.policy +
+    laborScore * weights.labor +
+    inflationScore * weights.inflation;
+
+  let score = Math.round(clamp(50 + weighted, 0, 100));
 
   let state: RegimeState['state'] = 'neutral';
   if (score >= 60) state = 'risk_on';
@@ -74,22 +95,25 @@ export async function fetchIntelligenceOverview() {
 
   const drivers: RegimeDriver[] = [
     {
-      key: 'spx',
-      label: 'S&P 500 daily change',
-      direction: toDirection(spxChange),
-      impact: spxChange > 0 ? 'positive' : spxChange < 0 ? 'negative' : 'neutral',
+      key: 'equities-breadth',
+      label: 'Equity risk appetite (SPX/NQ/Dow)',
+      direction: toDirection(avgEquityChange),
+      impact: avgEquityChange > 0 ? 'positive' : avgEquityChange < 0 ? 'negative' : 'neutral',
+      weight: weights.equities,
     },
     {
       key: 'fedfunds',
-      label: 'Fed Funds level',
+      label: 'Policy restrictiveness (Fed Funds)',
       direction: 'flat',
       impact: typeof fedFunds === 'number' && fedFunds > 5 ? 'negative' : 'neutral',
+      weight: weights.policy,
     },
     {
       key: 'unrate',
-      label: 'Unemployment rate',
+      label: 'Labor resilience (Unemployment)',
       direction: 'flat',
       impact: typeof unrate === 'number' && unrate <= 4.2 ? 'positive' : 'neutral',
+      weight: weights.labor,
     },
   ];
 
@@ -161,9 +185,43 @@ export async function fetchIntelligenceOverview() {
     },
   ];
 
+  const invalidations: InvalidationTrigger[] = [
+    {
+      id: 'inv-spx-down',
+      label: 'Equity momentum breakdown',
+      metric: 'S&P 500 daily change',
+      threshold: '< -1.5% daily',
+      status: spxChange <= -1.5 ? 'triggered' : spxChange <= -0.9 ? 'near' : 'safe',
+      sensitivity: 'high',
+      as_of: asOf,
+      confidence,
+    },
+    {
+      id: 'inv-fed-tight',
+      label: 'Policy tightness exceeds tolerance',
+      metric: 'Fed Funds',
+      threshold: '> 5.50%',
+      status: typeof fedFunds === 'number' && fedFunds > 5.5 ? 'triggered' : typeof fedFunds === 'number' && fedFunds > 5.2 ? 'near' : 'safe',
+      sensitivity: 'medium',
+      as_of: asOf,
+      confidence,
+    },
+    {
+      id: 'inv-labor-soft',
+      label: 'Labor deterioration risk',
+      metric: 'Unemployment rate',
+      threshold: '> 4.80%',
+      status: typeof unrate === 'number' && unrate > 4.8 ? 'triggered' : typeof unrate === 'number' && unrate > 4.5 ? 'near' : 'safe',
+      sensitivity: 'medium',
+      as_of: asOf,
+      confidence,
+    },
+  ];
+
   const overview: IntelligenceOverview = {
     regime,
     changes,
+    invalidations,
     quality: {
       as_of: asOf,
       confidence,

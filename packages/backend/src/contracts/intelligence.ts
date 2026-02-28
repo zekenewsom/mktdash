@@ -15,6 +15,7 @@ export interface RegimeDriver {
   label: string;
   direction: 'up' | 'down' | 'flat';
   impact: 'positive' | 'negative' | 'neutral';
+  weight?: number;
 }
 
 export interface RegimeState {
@@ -38,9 +39,31 @@ export interface MaterialChange {
   quality_flags?: QualityFlags;
 }
 
+export interface InvalidationTrigger {
+  id: string;
+  label: string;
+  metric: string;
+  threshold: string;
+  status: 'safe' | 'near' | 'triggered';
+  sensitivity: 'low' | 'medium' | 'high';
+  as_of: string;
+  confidence: ConfidenceLevel;
+}
+
+export interface HeadlineItem {
+  id: string;
+  title: string;
+  url: string;
+  source_count: number;
+  sources: string[];
+  as_of: string;
+  confidence: ConfidenceLevel;
+}
+
 export interface IntelligenceOverview {
   regime: RegimeState;
   changes: MaterialChange[];
+  invalidations: InvalidationTrigger[];
   quality: {
     as_of: string;
     confidence: ConfidenceLevel;

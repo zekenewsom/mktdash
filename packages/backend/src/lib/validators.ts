@@ -7,7 +7,7 @@ export function isIsoDateLike(value: unknown) {
 
 export function validateIntelligenceOverview(payload: any): payload is IntelligenceOverview {
   if (!payload || typeof payload !== 'object') return false;
-  if (!payload.regime || !payload.quality || !Array.isArray(payload.changes)) return false;
+  if (!payload.regime || !payload.quality || !Array.isArray(payload.changes) || !Array.isArray(payload.invalidations)) return false;
 
   const regime = payload.regime;
   if (!['risk_on', 'neutral', 'risk_off'].includes(regime.state)) return false;
@@ -23,6 +23,11 @@ export function validateIntelligenceOverview(payload: any): payload is Intellige
   if (typeof quality.stale_used !== 'boolean') return false;
   if (typeof quality.stale_count !== 'number') return false;
   if (!Array.isArray(quality.sources)) return false;
+
+  for (const inv of payload.invalidations) {
+    if (!inv?.id || !inv?.label || !inv?.metric || !inv?.threshold) return false;
+    if (!['safe', 'near', 'triggered'].includes(inv.status)) return false;
+  }
 
   return true;
 }

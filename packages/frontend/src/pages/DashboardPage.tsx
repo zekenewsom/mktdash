@@ -4,13 +4,15 @@ import ChartContainer from '../components/placeholders/ChartContainer';
 const ReportViewer = React.lazy(() => import('../components/placeholders/ReportViewer'));
 import RegimeStateCard from '../components/intelligence/RegimeStateCard';
 import WhatChangedPanel from '../components/intelligence/WhatChangedPanel';
+import InvalidationPanel from '../components/intelligence/InvalidationPanel';
+import HeadlineIntelligenceFeed from '../components/intelligence/HeadlineIntelligenceFeed';
 import DataQualityConsole from '../components/intelligence/DataQualityConsole';
 import EconomicCalendar from '../components/intelligence/EconomicCalendar';
 import CrossAssetConfirmationMatrix, { CrossAssetRow } from '../components/intelligence/CrossAssetConfirmationMatrix';
 
 // This page component sets up the basic dashboard layout
 import apiClient from '../lib/apiClient';
-import { MaterialChange, RegimeState } from '../contracts/intelligence';
+import { InvalidationTrigger, MaterialChange, RegimeState } from '../contracts/intelligence';
 
 const SERIES_LABELS: Record<string, string> = {
   SP500: 'S&P 500',
@@ -62,6 +64,7 @@ const DashboardPage: React.FC = () => {
 
   const [regime, setRegime] = React.useState<RegimeState | null>(null);
   const [changes, setChanges] = React.useState<MaterialChange[]>([]);
+  const [invalidations, setInvalidations] = React.useState<InvalidationTrigger[]>([]);
   const [matrixRows, setMatrixRows] = React.useState<CrossAssetRow[]>([]);
   const [intelligenceLoading, setIntelligenceLoading] = React.useState(false);
   const [intelligenceError, setIntelligenceError] = React.useState<string | null>(null);
@@ -113,6 +116,7 @@ const DashboardPage: React.FC = () => {
         const payload = res.data?.data || res.data;
         const apiRegime = payload?.regime;
         const apiChanges = payload?.changes || [];
+        const apiInvalidations = payload?.invalidations || [];
 
         if (!apiRegime) {
           throw new Error('Missing regime payload');
@@ -145,8 +149,20 @@ const DashboardPage: React.FC = () => {
           confidence: item.confidence || mappedRegime.confidence,
         }));
 
+        const mappedInvalidations: InvalidationTrigger[] = apiInvalidations.map((item: any) => ({
+          id: item.id,
+          label: item.label,
+          metric: item.metric,
+          threshold: item.threshold,
+          status: item.status,
+          sensitivity: item.sensitivity,
+          asOf: item.as_of || new Date().toISOString(),
+          confidence: item.confidence || mappedRegime.confidence,
+        }));
+
         setRegime(mappedRegime);
         setChanges(mappedChanges);
+        setInvalidations(mappedInvalidations);
         setMatrixRows(mapMatrixRowsFromRegime(mappedRegime));
       })
       .catch((err) => {
@@ -179,7 +195,7 @@ const DashboardPage: React.FC = () => {
       )}
 
       {/* Tier-1 intelligence row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
         {intelligenceLoading && (
           <div className="lg:col-span-2 bg-card text-card-foreground rounded-lg shadow p-4">
             Loading intelligence overview...
@@ -196,6 +212,7 @@ const DashboardPage: React.FC = () => {
           <>
             <RegimeStateCard regime={regime} />
             <WhatChangedPanel changes={changes} />
+            <InvalidationPanel triggers={invalidations} />
           </>
         )}
       </div>
@@ -231,6 +248,9 @@ const DashboardPage: React.FC = () => {
         </div>
         <div className="lg:col-span-1">
           <DataQualityConsole />
+        </div>
+        <div className="lg:col-span-3">
+          <HeadlineIntelligenceFeed />
         </div>
       </div>
 
