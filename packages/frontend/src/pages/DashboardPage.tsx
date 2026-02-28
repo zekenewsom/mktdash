@@ -7,6 +7,8 @@ import WhatChangedPanel from '../components/intelligence/WhatChangedPanel';
 import InvalidationPanel from '../components/intelligence/InvalidationPanel';
 import HeadlineIntelligenceFeed from '../components/intelligence/HeadlineIntelligenceFeed';
 import MarketMetricsPanel from '../components/intelligence/MarketMetricsPanel';
+import ThesisPanel from '../components/intelligence/ThesisPanel';
+import ContributorAttributionPanel from '../components/intelligence/ContributorAttributionPanel';
 import DataQualityConsole from '../components/intelligence/DataQualityConsole';
 import EconomicCalendar from '../components/intelligence/EconomicCalendar';
 import CrossAssetConfirmationMatrix, { CrossAssetRow } from '../components/intelligence/CrossAssetConfirmationMatrix';
@@ -259,6 +261,12 @@ const DashboardPage: React.FC = () => {
         </div>
         <div className="lg:col-span-3">
           <HeadlineIntelligenceFeed />
+        </div>
+        <div className="lg:col-span-2">
+          <ThesisPanel />
+        </div>
+        <div className="lg:col-span-1">
+          <ContributorAttributionPanel />
         </div>
       </div>
 

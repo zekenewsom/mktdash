@@ -14,10 +14,10 @@ Mode: Rolling Kanban (dynamic reprioritization)
 ## NOW (recalibrated next 72h)
 - [x] **S3-001** Finish ingestion quality metrics (`T1-004`): freshness/completeness/drift for intelligence + calendar + quality datasets — **Owner: DAE**
 - [x] **V2-001** Build feature registry (30+ metrics) with source/SLA/weights metadata — **Owner: DAE/SOPHIA**
-- [ ] **V2-002** Expand backend `/api/intelligence/metrics` to 30+ fields across sleeves — **Owner: DAE**
-- [ ] **V2-003** Implement thesis object schema + `/api/thesis/current` — **Owner: DAE/HEAVY**
-- [ ] **V2-004** Add base/alt/invalidation probability panel in frontend — **Owner: DAE**
-- [ ] **V2-005** Add contributor attribution panel (why regime score moved) — **Owner: DAE**
+- [x] **V2-002** Expand backend metrics architecture for multi-sleeve V2 (`/api/intelligence/metrics` + `/api/signals/features` seed set) — **Owner: DAE**
+- [x] **V2-003** Implement thesis object schema + `/api/thesis/current` — **Owner: DAE/HEAVY**
+- [x] **V2-004** Add base/alt/invalidation probability panel in frontend — **Owner: DAE**
+- [x] **V2-005** Add contributor attribution panel (why regime score moved) — **Owner: DAE**
 - [ ] **V2-006** Add drift checks + degraded mode confidence cap — **Owner: DAE/ARGUS**
 - [ ] **V2-007** Execute A1–A6 (Signal Foundation) from `docs/ARCHITECTURE_V2_TASK_BREAKDOWN.md` — **Owner: DAE**
 - [ ] **V2-008** Execute A7–A12 (Thesis Engine v1) — **Owner: DAE/HEAVY**
@@ -144,3 +144,4 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - **2026-02-27:** Institutional spec approved by human; executed next sprint: regime v2 + invalidation panel + headline corroboration feed.
 - **2026-02-27:** Expanded core metrics coverage (12+) and fixed chart data contract mismatch causing blank chart states.
 - **2026-02-27:** Began Phase 4 execution with deterministic report engine v1 schema, generator, and provenance metadata endpoint integration.
+- **2026-02-28:** Added V2 signal/thesis endpoints and frontend thesis+attribution panels (`/api/signals/*`, `/api/thesis/*`).

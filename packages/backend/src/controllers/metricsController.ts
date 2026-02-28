@@ -1,18 +1,10 @@
 import { Request, Response } from 'express';
 import { sendError, sendSuccess } from '../lib/apiResponse';
-import { fetchMacroData } from '../services/fredService';
-
-const METRIC_SERIES = [
-  'FEDFUNDS', 'CPIAUCSL', 'UNRATE',
-  'DGS10', 'DGS2', 'T10Y2Y',
-  'DTWEXBGS', 'DEXUSEU',
-  'DCOILWTICO', 'GOLDAMGBD228NLBM',
-  'VIXCLS', 'BAMLH0A0HYM2'
-];
+import { fetchIntelligenceMetrics } from '../services/signalSources';
 
 export const getIntelligenceMetrics = async (_req: Request, res: Response) => {
   try {
-    const result = await fetchMacroData(METRIC_SERIES);
+    const result = await fetchIntelligenceMetrics();
     if (result.error) {
       return sendError(res, 'UPSTREAM_DATA_WARNING', result.error, 200, undefined, result.data);
     }

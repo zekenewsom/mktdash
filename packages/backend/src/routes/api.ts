@@ -6,6 +6,8 @@ import { getEconomicCalendar } from '../controllers/calendarController';
 import { getOpenApiSpec } from '../controllers/docsController';
 import { getHeadlineIntelligence } from '../controllers/headlineController';
 import { getIntelligenceMetrics } from '../controllers/metricsController';
+import { getSignalFeatures, getSignalRegime } from '../controllers/signalsController';
+import { getCurrentThesis, getThesisTimeline } from '../controllers/thesisController';
 
 const router = Router();
 
@@ -23,6 +25,10 @@ router.get('/health/data-quality', getDataQuality);
 router.get('/calendar/events', getEconomicCalendar);
 router.get('/intelligence/headlines', getHeadlineIntelligence);
 router.get('/intelligence/metrics', getIntelligenceMetrics);
+router.get('/signals/features', getSignalFeatures);
+router.get('/signals/regime', getSignalRegime);
+router.get('/thesis/current', getCurrentThesis);
+router.get('/thesis/history', getThesisTimeline);
 router.get('/docs/openapi', getOpenApiSpec);
 
 // Placeholder route to trigger daily report generation (can be called manually for testing)

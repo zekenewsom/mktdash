@@ -37,6 +37,42 @@ paths:
       responses:
         '200':
           description: OK
+  /api/intelligence/headlines:
+    get:
+      summary: Corroborated headline intelligence feed
+      responses:
+        '200':
+          description: OK
+  /api/intelligence/metrics:
+    get:
+      summary: Expanded institutional metrics set
+      responses:
+        '200':
+          description: OK
+  /api/signals/features:
+    get:
+      summary: Feature snapshot for regime engine
+      responses:
+        '200':
+          description: OK
+  /api/signals/regime:
+    get:
+      summary: Regime output with dimensional attribution
+      responses:
+        '200':
+          description: OK
+  /api/thesis/current:
+    get:
+      summary: Dynamic current thesis (base + alternatives)
+      responses:
+        '200':
+          description: OK
+  /api/thesis/history:
+    get:
+      summary: Thesis history timeline
+      responses:
+        '200':
+          description: OK
   /api/market-indices:
     get:
       summary: Current index snapshot
