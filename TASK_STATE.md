@@ -13,12 +13,16 @@ Mode: Rolling Kanban (dynamic reprioritization)
 
 ## NOW (recalibrated next 72h)
 - [x] **S3-001** Finish ingestion quality metrics (`T1-004`): freshness/completeness/drift for intelligence + calendar + quality datasets — **Owner: DAE**
-- [ ] **V2-001** Build feature registry (30+ metrics) with source/SLA/weights metadata — **Owner: DAE/SOPHIA**
+- [x] **V2-001** Build feature registry (30+ metrics) with source/SLA/weights metadata — **Owner: DAE/SOPHIA**
 - [ ] **V2-002** Expand backend `/api/intelligence/metrics` to 30+ fields across sleeves — **Owner: DAE**
 - [ ] **V2-003** Implement thesis object schema + `/api/thesis/current` — **Owner: DAE/HEAVY**
 - [ ] **V2-004** Add base/alt/invalidation probability panel in frontend — **Owner: DAE**
 - [ ] **V2-005** Add contributor attribution panel (why regime score moved) — **Owner: DAE**
 - [ ] **V2-006** Add drift checks + degraded mode confidence cap — **Owner: DAE/ARGUS**
+- [ ] **V2-007** Execute A1–A6 (Signal Foundation) from `docs/ARCHITECTURE_V2_TASK_BREAKDOWN.md` — **Owner: DAE**
+- [ ] **V2-008** Execute A7–A12 (Thesis Engine v1) — **Owner: DAE/HEAVY**
+- [ ] **V2-009** Execute A13–A18 (Weighting + Quality Intelligence) — **Owner: DAE**
+- [ ] **V2-010** Execute A19–A24 (Governance + Drift Ops) — **Owner: DAE/ARGUS**
 - [x] **S4-001** Regime v2 rollout: weighted factor scoring in intelligence overview — **Owner: DAE**
 - [x] **S4-002** Add Invalidation Trigger Panel end-to-end (API + UI) — **Owner: DAE**
 - [x] **S4-003** Add Headline Intelligence Feed with source corroboration counts — **Owner: DAE**
