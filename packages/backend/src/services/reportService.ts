@@ -1,4 +1,6 @@
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 import { fetchIntelligenceOverview } from './intelligenceService';
 import { fetchEconomicCalendar } from './calendarService';
 import { fetchHeadlineIntelligence } from './headlineService';
@@ -15,6 +17,24 @@ function makeProvenance(snapshotSeed: string) {
   const snapshot_id = `snap_${shortHash(snapshotSeed)}`;
   const code_sha = process.env.RENDER_GIT_COMMIT || process.env.COMMIT_SHA || 'local-dev';
   return { run_id, snapshot_id, code_sha, generated_at };
+}
+
+function saveReportToJson(report: ReportOutput) {
+  try {
+    const reportsDir = path.resolve(process.cwd(), 'reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    
+    const date = new Date().toISOString().split('T')[0];
+    const filename = `report_${date}_${report.provenance.run_id}.json`;
+    const filepath = path.join(reportsDir, filename);
+    
+    fs.writeFileSync(filepath, JSON.stringify(report, null, 2), 'utf8');
+    console.log(`Report saved to: ${filepath}`);
+    return filepath;
+  } catch (err) {
+    console.error('Failed to save report:', err);
+    return null;
+  }
 }
 
 export async function generateDeterministicReport(input?: Partial<ReportInputContract>): Promise<ReportOutput> {
@@ -37,7 +57,7 @@ export async function generateDeterministicReport(input?: Partial<ReportInputCon
     key_message: `${intel.data.regime.state} regime with ${intel.data.quality.stale_count} stale signals and ${intel.data.quality.fallback_used ? 'fallback active' : 'no fallback usage'}`,
   };
 
-  return {
+  const report: ReportOutput = {
     template_version: 'v1',
     title: 'mktdash Daily Intelligence Report',
     as_of,
@@ -52,4 +72,9 @@ export async function generateDeterministicReport(input?: Partial<ReportInputCon
     },
     provenance,
   };
+
+  // Save report as JSON
+  saveReportToJson(report);
+
+  return report;
 }

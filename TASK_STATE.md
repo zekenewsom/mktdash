@@ -24,7 +24,8 @@ Mode: Rolling Kanban (dynamic reprioritization)
 - [x] **V2-009** Execute A13–A18 (Weighting + Quality Intelligence) — **Owner: DAE**
 - [x] **V2-011** Expand live metric universe from ~12 to 30+ active feeds and map sleeves to effective weights — **Owner: DAE/SOPHIA**
 - [x] **V2-012** Persist thesis history to artifacts store with replayable snapshots and add `/api/thesis/history` integrity checks — **Owner: DAE**
-- [ ] **V2-013** Add sleeve-level weighted contribution stats to frontend attribution panel — **Owner: DAE**
+- [x] **V2-013** Add sleeve-level weighted contribution stats to frontend attribution panel — **Owner: DAE**
+- [x] **B-011** Confirm report delivery surface (JSON to /reports folder, PDF on-demand) — **Owner: DAE**
 - [ ] **V2-010** Execute A19–A24 (Governance + Drift Ops) — **Owner: DAE/ARGUS**
 - [x] **S4-001** Regime v2 rollout: weighted factor scoring in intelligence overview — **Owner: DAE**
 - [x] **S4-002** Add Invalidation Trigger Panel end-to-end (API + UI) — **Owner: DAE**
@@ -55,7 +56,7 @@ Mode: Rolling Kanban (dynamic reprioritization)
 
 ## BLOCKED (waiting on decision/input)
 - [ ] **B-011** Confirm report delivery surface for v1 (`API JSON only` vs `PDF export in-app`) — **Owner: HUM**
-- [ ] **B-012** Approve Architecture V2 institutional redesign (`docs/ARCHITECTURE_V2_HEDGE_FUND.md`) as canonical target — **Owner: HUM**
+- [x] **B-012** Approve Architecture V2 institutional redesign (`docs/ARCHITECTURE_V2_HEDGE_FUND.md`) as canonical target — **Owner: HUM**
 
 ## DONE
 - [x] **D-001** Initial 10-week robustness plan drafted by PHR
