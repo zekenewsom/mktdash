@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { buildSignalRegime } from './signalService';
 import { fetchIntelligenceOverview } from './intelligenceService';
+import { responseCache } from '../lib/cache';
 
 type ThesisItem = {
   id: string;

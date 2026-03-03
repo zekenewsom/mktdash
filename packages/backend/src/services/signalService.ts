@@ -11,7 +11,10 @@ function ageMinutes(asOf?: string | null) {
 }
 
 export async function buildSignalFeatures() {
-  const metricsResult = await fetchIntelligenceMetrics();
+  const [metricsResult, driftResult] = await Promise.all([
+    fetchIntelligenceMetrics(),
+    assessDriftState(), // Pre-fetch drift for regime
+  ]);
   const metrics = metricsResult.data || {};
 
   const snapshots = FEATURE_REGISTRY.map((spec) => {
