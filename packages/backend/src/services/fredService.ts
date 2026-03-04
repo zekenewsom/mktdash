@@ -4,7 +4,7 @@ import { getWithRetry } from '../lib/httpClient';
 const FRED_API_KEY = process.env.FRED_API_KEY;
 const FRED_BASE_URL = 'https://api.stlouisfed.org/fred/series/observations';
 const PROVIDER_MODE = process.env.DATA_PROVIDER_MODE || 'fred';
-const PROVIDER_CACHE_TTL_MS = Number(process.env.PROVIDER_CACHE_TTL_MS || 5 * 60 * 1000);
+const PROVIDER_CACHE_TTL_MS = Number(process.env.PROVIDER_CACHE_TTL_MS || 15 * 60 * 1000); // 15 min cache
 
 // Comprehensive mock data for all 60+ metrics (including Daily Shot series)
 const MOCK_DATA: Record<string, DataPoint> = {
