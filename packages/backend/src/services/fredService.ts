@@ -158,8 +158,9 @@ export async function fetchMacroData(seriesIds: string[]) {
   try {
     const results: Record<string, DataPoint> = {};
 
-    for (const id of seriesIds) {
-      if (useMockOnly) {
+    // Fast path: use mock data if configured
+    if (useMockOnly) {
+      for (const id of seriesIds) {
         results[id] = MOCK_DATA[id] ?? {
           symbol: id,
           source: 'mock',
@@ -168,37 +169,43 @@ export async function fetchMacroData(seriesIds: string[]) {
           unit: 'unknown',
           quality_flags: { missing: true, fallback: true },
         };
-        continue;
       }
+      macroCache[cacheKey] = { data: results, ts: now };
+      return { data: results, error: null, cached: false };
+    }
 
-      const today = new Date().toISOString().slice(0, 10);
+    // Parallel fetch with batching (5 at a time to avoid rate limits)
+    const BATCH_SIZE = 5;
+    const today = new Date().toISOString().slice(0, 10);
+    
+    const fetchSeries = async (id: string): Promise<[string, DataPoint]> => {
       const url = `${FRED_BASE_URL}?series_id=${id}&api_key=${FRED_API_KEY}&file_type=json&observation_end=${today}`;
-
+      
       try {
         const resp = await getWithRetry(url);
         const obsArr = (resp.data as any).observations || [];
         const obs = obsArr.length > 0 ? obsArr[obsArr.length - 1] : undefined;
 
         if (obs && obs.value !== '.') {
-          results[id] = {
+          return [id, {
             symbol: id,
             source: 'fred',
             value: parseFloat(obs.value),
             as_of: obs.date,
             unit: getUnitForSeries(id),
-          };
+          }];
         } else {
-          results[id] = {
+          return [id, {
             symbol: id,
             source: 'fred',
             value: null,
             as_of: obs?.date || null,
             unit: getUnitForSeries(id),
             quality_flags: { missing: true },
-          };
+          }];
         }
       } catch {
-        results[id] = {
+        return [id, {
           ...(MOCK_DATA[id] ?? {
             symbol: id,
             source: 'mock',
@@ -207,7 +214,20 @@ export async function fetchMacroData(seriesIds: string[]) {
             unit: getUnitForSeries(id),
           }),
           quality_flags: { fallback: true },
-        };
+        }];
+      }
+    };
+
+    // Process in batches
+    for (let i = 0; i < seriesIds.length; i += BATCH_SIZE) {
+      const batch = seriesIds.slice(i, i + BATCH_SIZE);
+      const batchResults = await Promise.all(batch.map(fetchSeries));
+      for (const [id, data] of batchResults) {
+        results[id] = data;
+      }
+      // Small delay between batches to avoid rate limiting
+      if (i + BATCH_SIZE < seriesIds.length) {
+        await new Promise(resolve => setTimeout(resolve, 200));
       }
     }
 
