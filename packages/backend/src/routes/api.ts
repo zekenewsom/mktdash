@@ -10,6 +10,7 @@ import { getSignalFeatures, getSignalRegime } from '../controllers/signalsContro
 import { getCurrentThesis, getThesisTimeline } from '../controllers/thesisController';
 import { getDriftStatus } from '../controllers/driftController';
 import { getQualityIntelligence } from '../controllers/qualityController';
+import { getUnifiedData, getPhase2Data, getPhase3Data } from '../controllers/dataPhaseController';
 
 const router = Router();
 
@@ -37,5 +38,10 @@ router.get('/docs/openapi', getOpenApiSpec);
 
 // Placeholder route to trigger daily report generation (can be called manually for testing)
 router.post('/report/generate', generateDailyReport);
+
+// Phase 2 & 3 Data endpoints
+router.post('/data/unified', getUnifiedData);
+router.get('/data/phase2', getPhase2Data);
+router.get('/data/phase3', getPhase3Data);
 
 export default router;
