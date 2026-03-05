@@ -58,8 +58,14 @@ export async function fetchIndexPerformance() {
       const stooq = STOOQ_SYMBOL[key];
 
       try {
-        const stooqUrl = `https://stooq.com/q/l/?s=${stooq}&i=d`;
-        const stooqResp = await getWithRetry(stooqUrl, { timeout: 3000 }, 0);
+        const stooqUrl = `https://stooq.com/q/l/?s=${encodeURIComponent(stooq)}&i=d`;
+        const stooqResp = await getWithRetry(stooqUrl, {
+          timeout: 4500,
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (compatible; mktdash/1.0; +https://mktdash.vercel.app)',
+            Accept: 'text/csv,text/plain,*/*',
+          },
+        }, 1);
         const raw = String(stooqResp.data || '').trim();
         const parts = raw.split(',');
         if (parts.length >= 7) {
@@ -155,8 +161,14 @@ export async function fetchFredSeriesHistory(seriesId: string) {
   // Prefer stooq for index history (more reliable than FRED for equity indices)
   if (STOOQ_SYMBOL[seriesId]) {
     try {
-      const stooqUrl = `https://stooq.com/q/d/l/?s=${STOOQ_SYMBOL[seriesId]}&i=d`;
-      const stooqResp = await getWithRetry(stooqUrl, { timeout: 5000 }, 0);
+      const stooqUrl = `https://stooq.com/q/d/l/?s=${encodeURIComponent(STOOQ_SYMBOL[seriesId])}&i=d`;
+      const stooqResp = await getWithRetry(stooqUrl, {
+        timeout: 8000,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; mktdash/1.0; +https://mktdash.vercel.app)',
+          Accept: 'text/csv,text/plain,*/*',
+        },
+      }, 1);
       const lines = String(stooqResp.data || '').trim().split('\n');
       const rows = lines.slice(1).filter(Boolean);
       const data: TimeSeriesPoint[] = rows.slice(-5000).map((line: string) => {

@@ -12,6 +12,7 @@ import { getDriftStatus } from '../controllers/driftController';
 import { getQualityIntelligence } from '../controllers/qualityController';
 import { getUnifiedData, getPhase2Data, getPhase3Data } from '../controllers/dataPhaseController';
 import { getSnapshot } from '../controllers/overviewController';
+import { getVersion } from '../controllers/versionController';
 
 const router = Router();
 
@@ -47,5 +48,6 @@ router.get('/data/phase3', getPhase3Data);
 
 // Overview snapshot
 router.get('/overview/snapshot', getSnapshot);
+router.get('/version', getVersion);
 
 export default router;
