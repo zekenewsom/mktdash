@@ -47,7 +47,7 @@ export async function fetchIndexPerformance() {
 
   try {
     const results: Record<IndexKey, DataPoint & { change?: number; percentChange?: number }> = {} as any;
-    const useMockOnly = PROVIDER_MODE === 'mock_only' || !FRED_API_KEY;
+    const useMockOnly = PROVIDER_MODE === 'mock_only';
 
     for (const key of Object.keys(INDEX_SERIES) as IndexKey[]) {
       if (useMockOnly) {
@@ -148,7 +148,7 @@ export async function fetchFredSeriesHistory(seriesId: string) {
     return { data: indexHistoryCache[seriesId].data, error: null, cached: true };
   }
 
-  if (PROVIDER_MODE === 'mock_only' || !FRED_API_KEY) {
+  if (PROVIDER_MODE === 'mock_only') {
     return { data: [], error: null, cached: false };
   }
 
