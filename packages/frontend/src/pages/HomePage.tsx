@@ -114,19 +114,34 @@ const HomePage: React.FC = () => {
         <SummaryCard
           title="Market Snapshot"
           icon={LineChart}
-          indicators={snapshotData.markets.map(m => ({...m, linkType: m.id === 'DCOILWTICO' || m.id === 'DGS10' ? 'series' : 'series'}))}
+          indicators={snapshotData.markets.map((m: any) => ({
+            ...m,
+            id: m.id || m.symbol,
+            name: m.name || m.label,
+            linkType: 'series',
+          }))}
           viewMoreLink="/markets"
         />
         <SummaryCard
           title="Economic Pulse"
           icon={Activity}
-          indicators={snapshotData.economic.map(e => ({...e, linkType: 'series'}))}
+          indicators={snapshotData.economic.map((e: any) => ({
+            ...e,
+            id: e.id || e.symbol,
+            name: e.name || e.label,
+            linkType: 'series',
+          }))}
           viewMoreLink="/economic"
         />
         <SummaryCard
           title="Financial Stability Overview"
           icon={Shield}
-          indicators={snapshotData.financialStability.map(fs => ({...fs, linkType: 'series'}))}
+          indicators={snapshotData.financialStability.map((fs: any) => ({
+            ...fs,
+            id: fs.id || fs.symbol,
+            name: fs.name || fs.label,
+            linkType: 'series',
+          }))}
           viewMoreLink="/dashboard"
         />
       </div>

@@ -13,10 +13,20 @@ export interface SnapshotIndicatorItem {
   unit?: string;
 }
 
+export interface GaugeData {
+  value: number;
+  name: string;
+  rawValueDisplay?: string;
+  unit?: string;
+}
+
 export interface SnapshotData {
   markets: SnapshotIndicatorItem[];
   economic: SnapshotIndicatorItem[];
   financialStability: SnapshotIndicatorItem[];
+  marketGauge: GaugeData;
+  economicGauge: GaugeData;
+  stabilityGauge: GaugeData;
 }
 
 export async function fetchSnapshotData(): Promise<SnapshotData> {
@@ -69,5 +79,34 @@ export async function fetchSnapshotData(): Promise<SnapshotData> {
     { symbol: 'T10Y2Y', label: '2s10s Curve', value: stabilityResult.data['T10Y2Y']?.value ?? null, unit: '%' },
   ];
 
-  return { markets, economic, financialStability };
+  const marketChanges = markets
+    .map((m) => (typeof m.change === 'number' ? m.change : 0))
+    .slice(0, 3);
+  const positiveCount = marketChanges.filter((c) => c > 0).length;
+  const marketGauge = {
+    value: Math.round((positiveCount / 3) * 100),
+    name: 'Breadth',
+    rawValueDisplay: `${positiveCount}/3 positive`,
+    unit: '%',
+  };
+
+  const unrate = economic.find((e) => e.symbol === 'UNRATE')?.value ?? 0;
+  const fed = economic.find((e) => e.symbol === 'FEDFUNDS')?.value ?? 0;
+  const economicGauge = {
+    value: Math.max(0, Math.min(100, Math.round((6 - Number(unrate)) * 16 + (6 - Number(fed)) * 4))),
+    name: 'Macro Composite',
+    rawValueDisplay: `UNRATE ${unrate}% | FED ${fed}%`,
+    unit: '%',
+  };
+
+  const hy = financialStability.find((e) => e.symbol === 'BAMLH0A0HYM2')?.value ?? 0;
+  const ig = financialStability.find((e) => e.symbol === 'BAMLC0A0CM')?.value ?? 0;
+  const stabilityGauge = {
+    value: Math.max(0, Math.min(100, Math.round(100 - (Number(hy) * 10 + Number(ig) * 20)))),
+    name: 'Credit Stability',
+    rawValueDisplay: `HY ${hy}% | IG ${ig}%`,
+    unit: '%',
+  };
+
+  return { markets, economic, financialStability, marketGauge, economicGauge, stabilityGauge };
 }

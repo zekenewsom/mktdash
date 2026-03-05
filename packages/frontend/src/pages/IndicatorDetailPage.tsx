@@ -32,11 +32,30 @@ const IndicatorDetailPage: React.FC = () => {
     }
 
     apiClient.get(`/api/history?series=${encodeURIComponent(id)}`)
-      .then((res) => {
-        const rows = (res.data?.data || []).map((r: any) => ({
+      .then(async (res) => {
+        let rows = (res.data?.data || []).map((r: any) => ({
           date: r.date || r.as_of,
           value: Number(r.value),
         })).filter((r: any) => r.date && !Number.isNaN(r.value));
+
+        // If history is empty, attempt a unified snapshot fallback so clicks always resolve to data.
+        if (rows.length === 0) {
+          try {
+            const u = await apiClient.post('/api/data/unified', {
+              fred: [id.toUpperCase()],
+              yfinance: [id.toUpperCase()],
+            });
+            const fredRow = u.data?.data?.fred?.[id.toUpperCase()];
+            const yfRow = u.data?.data?.yfinance?.[id.toUpperCase()];
+            const row = fredRow || yfRow;
+            if (row?.value != null) {
+              rows = [{ date: row.as_of || new Date().toISOString().slice(0, 10), value: Number(row.value) }];
+            }
+          } catch {
+            // keep empty
+          }
+        }
+
         setData(rows);
         if (res.data?.error?.message) {
           setError(`Degraded source: ${res.data.error.message}`);
