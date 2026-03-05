@@ -28,10 +28,14 @@ export const getIndexHistory = async (req: Request, res: Response) => {
 
   try {
     const result = await fetchIndexHistory(index);
-    if (result.error) {
-      return sendError(res, 'UPSTREAM_FRED_WARNING', result.error, 200, { index }, result.data || []);
+    const rows = result.data || [];
+    if (result.error && rows.length > 0) {
+      return sendSuccess(res, rows);
     }
-    return sendSuccess(res, result.data || []);
+    if (result.error) {
+      return sendError(res, 'UPSTREAM_FRED_WARNING', result.error, 200, { index }, rows);
+    }
+    return sendSuccess(res, rows);
   } catch (err: any) {
     return sendError(res, 'INTERNAL_ERROR', err.message || 'Unknown error', 500);
   }
@@ -45,10 +49,15 @@ export const getSeriesHistory = async (req: Request, res: Response) => {
 
   try {
     const result = await fetchFredSeriesHistory(series);
-    if (result.error) {
-      return sendError(res, 'UPSTREAM_FRED_WARNING', result.error, 200, { series }, result.data || []);
+    const rows = result.data || [];
+    // If fallback rows exist, treat as successful degraded response (prevents UI hard-fail state).
+    if (result.error && rows.length > 0) {
+      return sendSuccess(res, rows);
     }
-    return sendSuccess(res, result.data || []);
+    if (result.error) {
+      return sendError(res, 'UPSTREAM_FRED_WARNING', result.error, 200, { series }, rows);
+    }
+    return sendSuccess(res, rows);
   } catch (err: any) {
     return sendError(res, 'INTERNAL_ERROR', err.message || 'Unknown error', 500);
   }

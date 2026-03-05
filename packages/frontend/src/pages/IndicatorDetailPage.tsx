@@ -57,8 +57,10 @@ const IndicatorDetailPage: React.FC = () => {
         }
 
         setData(rows);
-        if (res.data?.error?.message) {
+        if (res.data?.error?.message && rows.length === 0) {
           setError(`Degraded source: ${res.data.error.message}`);
+        } else if (rows.length > 0) {
+          setError(null);
         }
       })
       .catch((e) => setError(e.message || 'Failed to load series history'))
