@@ -21,24 +21,27 @@ const Navbar: React.FC = () => {
               mktdash
             </NavLink>
           </div>
-          <div className="flex space-x-4">
-            <NavLink to="/home" className={linkClass} end>
+          <div className="flex space-x-4 overflow-x-auto">
+            <NavLink to="/" className={linkClass} end>
               Home
             </NavLink>
-            <NavLink to="/" className={linkClass} end>
+            <NavLink to="/dashboard" className={linkClass}>
+              Dashboard
+            </NavLink>
+            <NavLink to="/markets" className={linkClass}>
               Markets
             </NavLink>
             <NavLink to="/economic" className={linkClass}>
               Economic
-            </NavLink>
-            <NavLink to="/stability" className={linkClass}>
-              Financial Stability
             </NavLink>
             <NavLink to="/calendar" className={linkClass}>
               Calendar
             </NavLink>
             <NavLink to="/analysis" className={linkClass}>
               Analysis
+            </NavLink>
+            <NavLink to="/news" className={linkClass}>
+              News
             </NavLink>
           </div>
         </div>
