@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build:frontend && rm -rf dist && cp -R packages/frontend/dist dist",
+  "buildCommand": "npm run build:frontend || npm run build; if [ -d packages/frontend/dist ]; then rm -rf dist && cp -R packages/frontend/dist dist; fi",
   "outputDirectory": "dist",
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
