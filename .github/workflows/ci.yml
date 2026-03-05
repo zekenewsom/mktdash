@@ -16,10 +16,10 @@ jobs:
           node-version: 22
 
       - name: Install deps (backend)
-        run: cd packages/backend && npm ci
+        run: cd packages/backend && npm install
 
       - name: Install deps (frontend)
-        run: cd packages/frontend && npm ci
+        run: cd packages/frontend && npm install
 
       - name: Secret scan
         run: npm run secret:scan
