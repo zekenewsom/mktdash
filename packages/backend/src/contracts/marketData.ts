@@ -1,4 +1,4 @@
-export type DataSource = 'fred' | 'mock' | 'rba' | 'bcb' | 'eurostat' | 'statsnz' | 'yfinance' | 'pmi';
+export type DataSource = 'fred' | 'mock' | 'stooq' | 'rba' | 'bcb' | 'eurostat' | 'statsnz' | 'yfinance' | 'pmi';
 
 export interface QualityFlags {
   stale?: boolean;

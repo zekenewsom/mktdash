@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import apiClient from '../lib/apiClient';
 import SummaryCard, { SnapshotIndicatorItem } from '../components/Home/SummaryCard';
 import GaugeChart from '../components/Home/GaugeChart';
 import { LineChart, Shield, Activity, Info } from 'lucide-react';
@@ -28,9 +28,9 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    axios.get('/api/overview/snapshot')
+    apiClient.get('/api/overview/snapshot')
       .then(res => {
-        setSnapshotData(res.data);
+        setSnapshotData(res.data?.data || res.data);
         setError(null);
       })
       .catch(_err => {
@@ -127,7 +127,7 @@ const HomePage: React.FC = () => {
           title="Financial Stability Overview"
           icon={Shield}
           indicators={snapshotData.financialStability.map(fs => ({...fs, linkType: 'series'}))}
-          viewMoreLink="/stability"
+          viewMoreLink="/dashboard"
         />
       </div>
 

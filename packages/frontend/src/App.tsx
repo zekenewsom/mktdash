@@ -6,6 +6,7 @@ import EconomicPage from './pages/EconomicPage';
 import EconomicCalendarPage from './pages/EconomicCalendarPage';
 import AnalysisPage from './pages/AnalysisPage';
 import NewsPage from './pages/NewsPage';
+import IndicatorDetailPage from './pages/IndicatorDetailPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
 
@@ -23,6 +24,8 @@ function App() {
             <Route path="/calendar" element={<EconomicCalendarPage />} />
             <Route path="/analysis" element={<AnalysisPage />} />
             <Route path="/news" element={<NewsPage />} />
+            <Route path="/series/:id" element={<IndicatorDetailPage />} />
+            <Route path="/crypto/:id" element={<IndicatorDetailPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

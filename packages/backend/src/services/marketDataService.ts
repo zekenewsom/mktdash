@@ -12,6 +12,12 @@ const INDEX_SERIES = {
   DJIA: 'DJIA',
 };
 
+const STOOQ_SYMBOL: Record<string, string> = {
+  SP500: '^spx',
+  NASDAQCOM: '^ndq',
+  DJIA: '^dji',
+};
+
 const INDEX_UNITS: Record<string, string> = {
   SP500: 'index',
   NASDAQCOM: 'index',
@@ -47,6 +53,36 @@ export async function fetchIndexPerformance() {
       if (useMockOnly) {
         results[key] = { ...MOCK_DATA[key], quality_flags: { fallback: true } } as any;
         continue;
+      }
+
+      const stooq = STOOQ_SYMBOL[key];
+
+      try {
+        const stooqUrl = `https://stooq.com/q/l/?s=${stooq}&i=d`;
+        const stooqResp = await getWithRetry(stooqUrl, { timeout: 3000 }, 0);
+        const raw = String(stooqResp.data || '').trim();
+        const parts = raw.split(',');
+        if (parts.length >= 7) {
+          const date = parts[1];
+          const close = Number(parts[6]);
+          const open = Number(parts[3]);
+          const change = close - open;
+          const percentChange = open ? (change / open) * 100 : 0;
+          if (!Number.isNaN(close)) {
+            results[key] = {
+              symbol: key,
+              source: 'stooq',
+              value: close,
+              as_of: date,
+              unit: INDEX_UNITS[key],
+              change,
+              percentChange,
+            };
+            continue;
+          }
+        }
+      } catch {
+        // fallback below
       }
 
       const seriesId = INDEX_SERIES[key];
@@ -114,6 +150,32 @@ export async function fetchFredSeriesHistory(seriesId: string) {
 
   if (PROVIDER_MODE === 'mock_only' || !FRED_API_KEY) {
     return { data: [], error: null, cached: false };
+  }
+
+  // Prefer stooq for index history (more reliable than FRED for equity indices)
+  if (STOOQ_SYMBOL[seriesId]) {
+    try {
+      const stooqUrl = `https://stooq.com/q/d/l/?s=${STOOQ_SYMBOL[seriesId]}&i=d`;
+      const stooqResp = await getWithRetry(stooqUrl, { timeout: 5000 }, 0);
+      const lines = String(stooqResp.data || '').trim().split('\n');
+      const rows = lines.slice(1).filter(Boolean);
+      const data: TimeSeriesPoint[] = rows.slice(-365).map((line: string) => {
+        const parts = line.split(',');
+        return {
+          symbol: seriesId,
+          source: 'stooq' as const,
+          as_of: parts[0],
+          value: Number(parts[4]),
+          unit: 'index',
+        };
+      }).filter((r) => !Number.isNaN(r.value));
+      if (data.length > 0) {
+        indexHistoryCache[seriesId] = { data, lastFetched: now };
+        return { data, error: null, cached: false };
+      }
+    } catch {
+      // continue to FRED fallback
+    }
   }
 
   const url = `${FRED_BASE_URL}?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json`;
