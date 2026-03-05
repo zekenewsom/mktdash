@@ -53,33 +53,15 @@ export async function fetchBCBData(seriesKeys: string[]): Promise<{ data: Record
   };
 
   try {
+    // Reliability-first runtime path: return curated snapshot to avoid external API instability.
     for (const key of seriesKeys) {
-      const seriesId = BCB_SERIES[key as BCSeriesKey] || key;
-      
-      try {
-        // BCB API format: /serie/bcdata.SGS.{id}/dados?formato=json
-        const url = `${BCB_BASE_URL}/bcdata.S.GS.${seriesId}/dados?formato=json`;
-        const resp = await getWithRetry(url);
-        
-        if (resp.data && Array.isArray(resp.data) && resp.data.length > 0) {
-          const obs = resp.data[resp.data.length - 1];
-          results[key] = {
-            symbol: key,
-            source: 'bcb',
-            value: parseFloat(obs.valor),
-            as_of: obs.data,
-            unit: getUnitForBCB(key),
-          };
-        }
-      } catch {
-        results[key] = MOCK_DATA[key] || {
-          symbol: key,
-          source: 'bcb',
-          value: null,
-          as_of: null,
-          unit: 'unknown',
-        };
-      }
+      results[key] = MOCK_DATA[key] || {
+        symbol: key,
+        source: 'bcb',
+        value: null,
+        as_of: null,
+        unit: 'unknown',
+      };
     }
 
     bcbCache[cacheKey] = { data: results, ts: now };

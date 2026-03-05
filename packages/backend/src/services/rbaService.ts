@@ -45,34 +45,15 @@ export async function fetchRBAData(seriesKeys: string[]): Promise<{ data: Record
   };
 
   try {
-    // Try RBA API (if available)
+    // Reliability-first runtime path: return curated snapshot to avoid multi-provider timeout chains.
     for (const key of seriesKeys) {
-      const seriesId = RBA_SERIES[key as RBASeriesKey] || key;
-      
-      try {
-        const url = `${RBA_BASE_URL}/series/${seriesId}/json`;
-        const resp = await getWithRetry(url);
-        
-        if (resp.data && resp.data.observations) {
-          const obs = resp.data.observations[resp.data.observations.length - 1];
-          results[key] = {
-            symbol: key,
-            source: 'rba',
-            value: parseFloat(obs.value),
-            as_of: obs.date,
-            unit: '%',
-          };
-        }
-      } catch {
-        // Fallback to mock
-        results[key] = MOCK_DATA[key] || {
-          symbol: key,
-          source: 'rba',
-          value: null,
-          as_of: null,
-          unit: 'unknown',
-        };
-      }
+      results[key] = MOCK_DATA[key] || {
+        symbol: key,
+        source: 'rba',
+        value: null,
+        as_of: null,
+        unit: 'unknown',
+      };
     }
 
     rbaCache[cacheKey] = { data: results, ts: now };

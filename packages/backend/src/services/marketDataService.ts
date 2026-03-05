@@ -60,12 +60,12 @@ export async function fetchIndexPerformance() {
       try {
         const stooqUrl = `https://stooq.com/q/l/?s=${stooq}&i=d`;
         const stooqResp = await getWithRetry(stooqUrl, {
-          timeout: 9000,
+          timeout: 3500,
           headers: {
             'User-Agent': 'Mozilla/5.0 (compatible; mktdash/1.0; +https://mktdash.vercel.app)',
             Accept: 'text/csv,text/plain,*/*',
           },
-        }, 1);
+        }, 0);
         const raw = String(stooqResp.data || '').trim();
         const parts = raw.split(',');
         if (parts.length >= 7) {
@@ -163,12 +163,12 @@ export async function fetchFredSeriesHistory(seriesId: string) {
     try {
       const stooqUrl = `https://stooq.com/q/d/l/?s=${STOOQ_SYMBOL[seriesId]}&i=d`;
       const stooqResp = await getWithRetry(stooqUrl, {
-        timeout: 20000,
+        timeout: 6000,
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; mktdash/1.0; +https://mktdash.vercel.app)',
           Accept: 'text/csv,text/plain,*/*',
         },
-      }, 1);
+      }, 0);
       const lines = String(stooqResp.data || '').trim().split('\n');
       const rows = lines.slice(1).filter(Boolean);
       const data: TimeSeriesPoint[] = rows.slice(-5000).map((line: string) => {
