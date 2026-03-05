@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import MarketOverviewCard from '../components/placeholders/MarketOverviewCard';
 import TableContainer from '../components/placeholders/TableContainer';
 import NewsFeed from '../components/placeholders/NewsFeed';
-import ReportViewer from '../components/placeholders/ReportViewer';
+const ReportViewer = React.lazy(() => import('../components/placeholders/ReportViewer'));
 import { 
   Briefcase, TrendingUp, BarChart3, Scale, ShieldAlert, Banknote, 
   Globe, DollarSign, Fuel, Gem, Leaf, Home as HomeIcon, Building2, Construction, Bitcoin 
@@ -225,7 +225,9 @@ const MarketsPage: React.FC = () => {
           <NewsFeed />
         </div>
         <div className="lg:col-span-2">
-          <ReportViewer />
+          <React.Suspense fallback={<div className="text-sm text-muted-foreground">Loading report module...</div>}>
+            <ReportViewer />
+          </React.Suspense>
         </div>
       </div>
     </div>
