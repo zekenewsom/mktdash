@@ -3,6 +3,7 @@
  */
 
 import { fetchMacroData } from './fredService';
+import { fetchIndexPerformance } from './marketDataService';
 
 export interface SnapshotIndicatorItem {
   symbol: string;
@@ -19,15 +20,32 @@ export interface SnapshotData {
 }
 
 export async function fetchSnapshotData(): Promise<SnapshotData> {
-  // Market indicators
-  const marketSymbols = ['SP500', 'DJIA', 'NASDAQCOM', 'VIXCLS'];
-  const marketResult = await fetchMacroData(marketSymbols);
-  
+  // Market indicators (use dedicated index service for accurate live index prints)
+  const [indexResult, vixResult] = await Promise.all([
+    fetchIndexPerformance(),
+    fetchMacroData(['VIXCLS']),
+  ]);
+
   const markets: SnapshotIndicatorItem[] = [
-    { symbol: 'SP500', label: 'S&P 500', value: marketResult.data['SP500']?.value ?? null },
-    { symbol: 'DJIA', label: 'Dow Jones', value: marketResult.data['DJIA']?.value ?? null },
-    { symbol: 'NASDAQCOM', label: 'Nasdaq', value: marketResult.data['NASDAQCOM']?.value ?? null },
-    { symbol: 'VIXCLS', label: 'VIX', value: marketResult.data['VIXCLS']?.value ?? null },
+    {
+      symbol: 'SP500',
+      label: 'S&P 500',
+      value: indexResult.data?.SP500?.value ?? null,
+      change: indexResult.data?.SP500?.percentChange,
+    },
+    {
+      symbol: 'DJIA',
+      label: 'Dow Jones',
+      value: indexResult.data?.DJIA?.value ?? null,
+      change: indexResult.data?.DJIA?.percentChange,
+    },
+    {
+      symbol: 'NASDAQCOM',
+      label: 'Nasdaq',
+      value: indexResult.data?.NASDAQCOM?.value ?? null,
+      change: indexResult.data?.NASDAQCOM?.percentChange,
+    },
+    { symbol: 'VIXCLS', label: 'VIX', value: vixResult.data['VIXCLS']?.value ?? null },
   ];
 
   // Economic indicators

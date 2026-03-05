@@ -159,7 +159,7 @@ export async function fetchFredSeriesHistory(seriesId: string) {
       const stooqResp = await getWithRetry(stooqUrl, { timeout: 5000 }, 0);
       const lines = String(stooqResp.data || '').trim().split('\n');
       const rows = lines.slice(1).filter(Boolean);
-      const data: TimeSeriesPoint[] = rows.slice(-365).map((line: string) => {
+      const data: TimeSeriesPoint[] = rows.slice(-5000).map((line: string) => {
         const parts = line.split(',');
         return {
           symbol: seriesId,
