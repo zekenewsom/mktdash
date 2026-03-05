@@ -133,7 +133,16 @@ export async function fetchFredSeriesHistory(seriesId: string) {
     indexHistoryCache[seriesId] = { data, lastFetched: now };
     return { data, error: null, cached: false };
   } catch (err: any) {
-    return { data: [], error: err.message || 'API error', cached: false };
+    const fallbackValue = (MOCK_DATA as any)[seriesId]?.value ?? 100;
+    const fallback: TimeSeriesPoint[] = Array.from({ length: 60 }).map((_, i) => ({
+      symbol: seriesId,
+      source: 'mock',
+      as_of: new Date(Date.now() - (59 - i) * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+      value: Number((fallbackValue * (0.96 + (i / 60) * 0.08)).toFixed(2)),
+      unit: 'index',
+    }));
+    indexHistoryCache[seriesId] = { data: fallback, lastFetched: now };
+    return { data: fallback, error: err.message || 'API error', cached: false };
   }
 }
 

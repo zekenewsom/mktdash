@@ -95,37 +95,15 @@ export async function fetchPMIData(seriesKeys: string[]): Promise<{ data: Record
   const results: Record<string, DataPoint> = {};
 
   try {
-    // Try scraping from tradingeconomics.com
-    const tradingEconBase = 'https://tradingeconomics.com';
-    
+    // Reliability-first: skip fragile scraping in runtime path and use curated snapshot.
     for (const key of seriesKeys) {
-      const path = PMI_SERIES[key as PMISeriesKey];
-      
-      try {
-        if (path) {
-          // Try to scrape PMI data
-          const url = `${tradingEconBase}/${path}`;
-          const resp = await getWithRetry(url);
-          
-          // Parse HTML to find PMI value (simplified - would need proper parsing)
-          // For now, return mock data
-          results[key] = MOCK_DATA[key] || {
-            symbol: key,
-            source: 'pmi',
-            value: null,
-            as_of: null,
-            unit: 'index',
-          };
-        }
-      } catch {
-        results[key] = MOCK_DATA[key] || {
-          symbol: key,
-          source: 'pmi',
-          value: null,
-          as_of: null,
-          unit: 'index',
-        };
-      }
+      results[key] = MOCK_DATA[key] || {
+        symbol: key,
+        source: 'pmi',
+        value: null,
+        as_of: null,
+        unit: 'index',
+      };
     }
 
     pmiCache[cacheKey] = { data: results, ts: now };
