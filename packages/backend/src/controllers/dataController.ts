@@ -29,9 +29,9 @@ export const getIndexHistory = async (req: Request, res: Response) => {
   try {
     const result = await fetchIndexHistory(index);
     if (result.error) {
-      return sendError(res, 'UPSTREAM_FRED_ERROR', result.error, 500, { index }, result.data);
+      return sendError(res, 'UPSTREAM_FRED_WARNING', result.error, 200, { index }, result.data || []);
     }
-    return sendSuccess(res, result.data);
+    return sendSuccess(res, result.data || []);
   } catch (err: any) {
     return sendError(res, 'INTERNAL_ERROR', err.message || 'Unknown error', 500);
   }
@@ -46,9 +46,9 @@ export const getSeriesHistory = async (req: Request, res: Response) => {
   try {
     const result = await fetchFredSeriesHistory(series);
     if (result.error) {
-      return sendError(res, 'UPSTREAM_FRED_ERROR', result.error, 500, { series }, result.data);
+      return sendError(res, 'UPSTREAM_FRED_WARNING', result.error, 200, { series }, result.data || []);
     }
-    return sendSuccess(res, result.data);
+    return sendSuccess(res, result.data || []);
   } catch (err: any) {
     return sendError(res, 'INTERNAL_ERROR', err.message || 'Unknown error', 500);
   }
