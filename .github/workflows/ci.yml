@@ -11,29 +11,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
+          cache: 'npm'
 
       - name: Install deps (backend)
-        run: corepack pnpm --filter backend install --frozen-lockfile
+        run: cd packages/backend && npm ci
 
       - name: Install deps (frontend)
-        run: corepack pnpm --filter frontend install --frozen-lockfile
+        run: cd packages/frontend && npm ci
 
       - name: Secret scan
         run: npm run secret:scan
 
       - name: Build backend
-        run: corepack pnpm --filter backend build
+        run: cd packages/backend && npm run build
 
       - name: Build frontend
-        run: corepack pnpm --filter frontend build
+        run: cd packages/frontend && npm run build
 
       - name: Start backend
         run: |
