@@ -11,6 +11,7 @@ import { getCurrentThesis, getThesisTimeline } from '../controllers/thesisContro
 import { getDriftStatus } from '../controllers/driftController';
 import { getQualityIntelligence } from '../controllers/qualityController';
 import { getUnifiedData, getPhase2Data, getPhase3Data } from '../controllers/dataPhaseController';
+import { getSnapshot } from '../controllers/overviewController';
 
 const router = Router();
 
@@ -43,5 +44,8 @@ router.post('/report/generate', generateDailyReport);
 router.post('/data/unified', getUnifiedData);
 router.get('/data/phase2', getPhase2Data);
 router.get('/data/phase3', getPhase3Data);
+
+// Overview snapshot
+router.get('/overview/snapshot', getSnapshot);
 
 export default router;

@@ -1,18 +1,27 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import DashboardPage from './pages/DashboardPage';
+import HomePage from './pages/HomePage';
+import MarketsPage from './pages/MarketsPage';
+import EconomicPage from './pages/EconomicPage';
+import EconomicCalendarPage from './pages/EconomicCalendarPage';
+import AnalysisPage from './pages/AnalysisPage';
+import NewsPage from './pages/NewsPage';
 import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
-  // You might add context providers (e.g., for theme, data) here later
-  // For now, just render the main dashboard page
-
   return (
-    // Apply dark mode class to the root div or body if needed,
-    // or manage it via a context and apply to a higher-level component.
-    // Tailwind's dark mode is set up to use the 'dark' class on the HTML element by default.
     <ErrorBoundary>
-      <div className="min-h-screen bg-background text-foreground">
-        <DashboardPage />
-      </div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/markets" element={<MarketsPage />} />
+          <Route path="/economic" element={<EconomicPage />} />
+          <Route path="/calendar" element={<EconomicCalendarPage />} />
+          <Route path="/analysis" element={<AnalysisPage />} />
+          <Route path="/news" element={<NewsPage />} />
+        </Routes>
+      </BrowserRouter>
     </ErrorBoundary>
   );
 }
