@@ -58,9 +58,9 @@ export async function fetchIndexPerformance() {
       const stooq = STOOQ_SYMBOL[key];
 
       try {
-        const stooqUrl = `https://stooq.com/q/l/?s=${encodeURIComponent(stooq)}&i=d`;
+        const stooqUrl = `https://stooq.com/q/l/?s=${stooq}&i=d`;
         const stooqResp = await getWithRetry(stooqUrl, {
-          timeout: 4500,
+          timeout: 9000,
           headers: {
             'User-Agent': 'Mozilla/5.0 (compatible; mktdash/1.0; +https://mktdash.vercel.app)',
             Accept: 'text/csv,text/plain,*/*',
@@ -161,9 +161,9 @@ export async function fetchFredSeriesHistory(seriesId: string) {
   // Prefer stooq for index history (more reliable than FRED for equity indices)
   if (STOOQ_SYMBOL[seriesId]) {
     try {
-      const stooqUrl = `https://stooq.com/q/d/l/?s=${encodeURIComponent(STOOQ_SYMBOL[seriesId])}&i=d`;
+      const stooqUrl = `https://stooq.com/q/d/l/?s=${STOOQ_SYMBOL[seriesId]}&i=d`;
       const stooqResp = await getWithRetry(stooqUrl, {
-        timeout: 8000,
+        timeout: 20000,
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; mktdash/1.0; +https://mktdash.vercel.app)',
           Accept: 'text/csv,text/plain,*/*',
