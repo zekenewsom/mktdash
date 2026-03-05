@@ -76,71 +76,73 @@ function evidenceFromRegime(regime: any) {
 }
 
 export async function buildCurrentThesis() {
-  const regimeResult = await buildSignalRegime();
-  const overviewResult = await fetchIntelligenceOverview();
+  return responseCache.getOrFetch('thesis:current:v2', async () => {
+    const regimeResult = await buildSignalRegime();
+    const overviewResult = await fetchIntelligenceOverview();
 
-  const regime = regimeResult.data.regime;
-  const drift = regimeResult.data.drift;
-  const inv = overviewResult.data.invalidations || [];
-  const { forE, againstE } = evidenceFromRegime(regimeResult.data);
+    const regime = regimeResult.data.regime;
+    const drift = regimeResult.data.drift;
+    const inv = overviewResult.data.invalidations || [];
+    const { forE, againstE } = evidenceFromRegime(regimeResult.data);
 
-  const priorBase = regime.label === 'risk_on' ? 58 : regime.label === 'risk_off' ? 28 : 45;
-  const qualityAdj = drift?.state === 'red' ? -12 : drift?.state === 'yellow' ? -6 : 0;
-  const convictionAdj = regime.score >= 60 || regime.score <= 40 ? 8 : 0;
-  const baseProb = Math.max(15, Math.min(80, priorBase + qualityAdj + convictionAdj));
+    const priorBase = regime.label === 'risk_on' ? 58 : regime.label === 'risk_off' ? 28 : 45;
+    const qualityAdj = drift?.state === 'red' ? -12 : drift?.state === 'yellow' ? -6 : 0;
+    const convictionAdj = regime.score >= 60 || regime.score <= 40 ? 8 : 0;
+    const baseProb = Math.max(15, Math.min(80, priorBase + qualityAdj + convictionAdj));
 
-  const baseRaw: ThesisItem = {
-    id: 'th-base',
-    name: regime.label === 'risk_on' ? 'Risk continuation' : regime.label === 'risk_off' ? 'Defensive risk-off' : 'Mixed transition',
-    narrative: `State ${regime.label} (score ${regime.score}) with drift=${drift?.state || 'unknown'}.`,
-    probability: baseProb,
-    horizon: '1w',
-    invalidations: inv.map((x: any) => `${x.metric} ${x.threshold}`),
-    evidence_for: forE,
-    evidence_against: againstE,
-  };
+    const baseRaw: ThesisItem = {
+      id: 'th-base',
+      name: regime.label === 'risk_on' ? 'Risk continuation' : regime.label === 'risk_off' ? 'Defensive risk-off' : 'Mixed transition',
+      narrative: `State ${regime.label} (score ${regime.score}) with drift=${drift?.state || 'unknown'}.`,
+      probability: baseProb,
+      horizon: '1w',
+      invalidations: inv.map((x: any) => `${x.metric} ${x.threshold}`),
+      evidence_for: forE,
+      evidence_against: againstE,
+    };
 
-  const alt1: ThesisItem = {
-    id: 'th-alt-1',
-    name: 'Growth scare rebound in rates',
-    narrative: 'Rates repricing drives risk rotation and elevates macro sensitivity.',
-    probability: Math.max(10, 100 - baseProb - 20),
-    horizon: '1w',
-    invalidations: ['2Y yield fails breakout', 'Credit spreads tighten'],
-    evidence_for: ['Rates volatility rising', 'Defensive leadership improving'],
-    evidence_against: ['Equity breadth broadening'],
-  };
+    const alt1: ThesisItem = {
+      id: 'th-alt-1',
+      name: 'Growth scare rebound in rates',
+      narrative: 'Rates repricing drives risk rotation and elevates macro sensitivity.',
+      probability: Math.max(10, 100 - baseProb - 20),
+      horizon: '1w',
+      invalidations: ['2Y yield fails breakout', 'Credit spreads tighten'],
+      evidence_for: ['Rates volatility rising', 'Defensive leadership improving'],
+      evidence_against: ['Equity breadth broadening'],
+    };
 
-  const alt2: ThesisItem = {
-    id: 'th-alt-2',
-    name: 'Policy shock repricing',
-    narrative: 'Policy path shifts increase USD and volatility pressure.',
-    probability: 20,
-    horizon: '1m',
-    invalidations: ['Fed communication softens', 'USD momentum fades'],
-    evidence_for: ['Policy path uncertainty elevated'],
-    evidence_against: ['Inflation impulse not accelerating'],
-  };
+    const alt2: ThesisItem = {
+      id: 'th-alt-2',
+      name: 'Policy shock repricing',
+      narrative: 'Policy path shifts increase USD and volatility pressure.',
+      probability: 20,
+      horizon: '1m',
+      invalidations: ['Fed communication softens', 'USD momentum fades'],
+      evidence_for: ['Policy path uncertainty elevated'],
+      evidence_against: ['Inflation impulse not accelerating'],
+    };
 
-  const normalized = normalizeProbs([baseRaw, alt1, alt2]);
-  const [base, ...alts] = normalized.sort((a, b) => b.probability - a.probability);
+    const normalized = normalizeProbs([baseRaw, alt1, alt2]);
+    const [base, ...alts] = normalized.sort((a, b) => b.probability - a.probability);
 
-  const snapshot: ThesisSnapshot = {
-    as_of: new Date().toISOString(),
-    base,
-    alternatives: alts,
-    confidence: regime.confidence,
-    drift_state: drift?.state,
-  };
+    const snapshot: ThesisSnapshot = {
+      as_of: new Date().toISOString(),
+      base,
+      alternatives: alts,
+      confidence: regime.confidence,
+      drift_state: drift?.state,
+    };
 
-  history.unshift(snapshot);
-  if (history.length > HISTORY_MAX) history.splice(HISTORY_MAX);
-  appendHistory(snapshot);
+    history.unshift(snapshot);
+    if (history.length > HISTORY_MAX) history.splice(HISTORY_MAX);
+    appendHistory(snapshot);
 
-  return {
-    data: snapshot,
-    error: regimeResult.error || overviewResult.error,
-  };
+    return {
+      data: snapshot,
+      error: regimeResult.error || overviewResult.error,
+    };
+  }, 60_000);
 }
 
 export function getThesisHistory() {

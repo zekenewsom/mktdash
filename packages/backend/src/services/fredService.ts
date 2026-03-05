@@ -174,15 +174,14 @@ export async function fetchMacroData(seriesIds: string[]) {
       return { data: results, error: null, cached: false };
     }
 
-    // Parallel fetch with batching (5 at a time to avoid rate limits)
-    const BATCH_SIZE = 5;
+    // Fast parallel fetch with aggressive fallback (prevents frontend 30s timeouts)
     const today = new Date().toISOString().slice(0, 10);
-    
+
     const fetchSeries = async (id: string): Promise<[string, DataPoint]> => {
       const url = `${FRED_BASE_URL}?series_id=${id}&api_key=${FRED_API_KEY}&file_type=json&observation_end=${today}`;
-      
+
       try {
-        const resp = await getWithRetry(url);
+        const resp = await getWithRetry(url, { timeout: 2500 }, 0);
         const obsArr = (resp.data as any).observations || [];
         const obs = obsArr.length > 0 ? obsArr[obsArr.length - 1] : undefined;
 
@@ -194,16 +193,16 @@ export async function fetchMacroData(seriesIds: string[]) {
             as_of: obs.date,
             unit: getUnitForSeries(id),
           }];
-        } else {
-          return [id, {
-            symbol: id,
-            source: 'fred',
-            value: null,
-            as_of: obs?.date || null,
-            unit: getUnitForSeries(id),
-            quality_flags: { missing: true },
-          }];
         }
+
+        return [id, {
+          symbol: id,
+          source: 'fred',
+          value: null,
+          as_of: obs?.date || null,
+          unit: getUnitForSeries(id),
+          quality_flags: { missing: true },
+        }];
       } catch {
         return [id, {
           ...(MOCK_DATA[id] ?? {
@@ -218,17 +217,9 @@ export async function fetchMacroData(seriesIds: string[]) {
       }
     };
 
-    // Process in batches
-    for (let i = 0; i < seriesIds.length; i += BATCH_SIZE) {
-      const batch = seriesIds.slice(i, i + BATCH_SIZE);
-      const batchResults = await Promise.all(batch.map(fetchSeries));
-      for (const [id, data] of batchResults) {
-        results[id] = data;
-      }
-      // Small delay between batches to avoid rate limiting
-      if (i + BATCH_SIZE < seriesIds.length) {
-        await new Promise(resolve => setTimeout(resolve, 200));
-      }
+    const settled = await Promise.all(seriesIds.map(fetchSeries));
+    for (const [id, data] of settled) {
+      results[id] = data;
     }
 
     macroCache[cacheKey] = { data: results, ts: now };

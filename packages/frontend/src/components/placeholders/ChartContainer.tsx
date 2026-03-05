@@ -1,6 +1,6 @@
 import React from 'react';
 
-const NewIndexChart = React.lazy(() => import('../NewIndexChart'));
+const IndexChart = React.lazy(() => import('../IndexChart'));
 
 // Placeholder component for displaying interactive charts
 interface ChartContainerProps {
@@ -28,7 +28,7 @@ const ChartContainer: React.FC<ChartContainerProps> = ({
           <span className="text-red-600">{error}</span>
         ) : (
           <React.Suspense fallback={<span className="text-muted-foreground">Loading chart bundle...</span>}>
-            <NewIndexChart
+            <IndexChart
               data={data}
               indexName={indexName}
             />
