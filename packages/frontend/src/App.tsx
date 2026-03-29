@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import DashboardPage from './pages/DashboardPage';
 import HomePage from './pages/HomePage';
 import MarketsPage from './pages/MarketsPage';
@@ -29,6 +30,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
+        <SpeedInsights />
       </BrowserRouter>
     </ErrorBoundary>
   );
